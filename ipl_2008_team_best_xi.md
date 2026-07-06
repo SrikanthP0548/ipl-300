@@ -1,15 +1,26 @@
-# IPL 2008 — Batting, Bowling and Best Possible XI by Team
+# IPL 2008 — Role-Based Best Possible XI by Team
 
 Source: uploaded 2008 batting performance table and uploaded 2008 bowling performance table.
 
-## Selection logic
+## What “Best Possible XI” means here
 
-- For each team, the XI is selected from that team only.
-- Core batting value uses runs, average, strike rate, innings played, sixes, and percentage of team runs.
-- Core bowling value uses wickets, economy rate, bowling average, bowling strike rate, balls bowled, and innings bowled.
-- The XI is balanced by taking strong batting contributors plus at least five practical bowling options where the team data allows it.
-- Wicketkeeper value is protected where the team has a clear keeper in the batting table.
-- Empty cells mean the player did not have recorded stats in that discipline in the supplied table.
+- Each XI is selected from that team only.
+- The XI is role-balanced, not just sorted by total runs or wickets.
+- Every team has openers, middle-order batters, at least one finisher, a wicketkeeper, spin option(s), and pace option(s), as far as the supplied 2008 data allows.
+- The combined XI tables keep the original batting and bowling statistics. Empty cells mean that player did not have recorded stats in that discipline in the supplied table.
+
+## Role-Based XI Summary
+
+| Team | XI with roles | WK | Pace options | Spin options |
+| --- | --- | --- | --- | --- |
+| Chennai Super Kings | 1. M L Hayden (Opener); 2. P A Patel (Opener / WK); 3. M E K Hussey (Top-order anchor); 4. S K Raina (Middle order); 5. M S Dhoni (WK / Finisher); 6. S Badrinath (Middle order / Finisher); 7. J A Morkel (Pace all-rounder / Finisher); 8. M Gony (Pacer); 9. L Balaji (Pacer); 10. M Muralitharan (Spinner); 11. M Ntini (Pacer) | P A Patel, M S Dhoni | 4 | 1 |
+| Deccan Chargers | 1. A C Gilchrist (Opener / WK); 2. H H Gibbs (Opener); 3. V V S Laxman (Top-order anchor); 4. R G Sharma (Middle order / Part-time spin); 5. A Symonds (Middle order / Finisher); 6. Y Venugopal Rao (Middle order); 7. Shahid Afridi (Spin all-rounder / Finisher); 8. W P U J C Vaas (Pacer); 9. R P Singh (Pacer); 10. P P Ojha (Spinner); 11. D P Vijaykumar (Pacer) | A C Gilchrist | 3 | 3 |
+| Delhi Capitals | 1. G Gambhir (Opener); 2. V Sehwag (Opener / Part-time spin); 3. S Dhawan (Top order); 4. A B de Villiers (Middle order); 5. T M Dilshan (Middle order / Part-time spin); 6. K D Karthik (WK / Finisher); 7. M F Maharoof (Pace all-rounder); 8. A Mishra (Spinner); 9. V Y Mahesh (Pacer); 10. G D McGrath (Pacer); 11. Mohammad Asif (Pacer) | K D Karthik | 4 | 3 |
+| Kolkata Knight Riders | 1. B B McCullum (Opener); 2. Salman Butt (Opener); 3. S C Ganguly (Top order / Medium pace); 4. D J Hussey (Middle order); 5. W P Saha (WK / Middle order); 6. L R Shukla (Finisher / Medium pace); 7. A B Agarkar (Pace all-rounder); 8. Umar Gul (Pacer); 9. A B Dinda (Pacer); 10. M Kartik (Spinner); 11. I Sharma (Pacer) | W P Saha | 6 | 1 |
+| Mumbai Indians | 1. S T Jayasuriya (Opener / Spin); 2. S R Tendulkar (Opener); 3. R V Uthappa (Top order); 4. D J J Bravo (Middle order / Pace all-rounder); 5. A M Nayar (Finisher / Medium pace); 6. S M Pollock (Pace all-rounder); 7. Y V Takawale (WK); 8. Harbhajan Singh (Spinner); 9. C R D Fernando (Pacer); 10. A Nehra (Pacer); 11. D S Kulkarni (Pacer) | Y V Takawale | 6 | 2 |
+| Punjab Kings | 1. S E Marsh (Opener); 2. K C Sangakkara (Opener / WK); 3. D P M D Jayawardene (Middle order); 4. Yuvraj Singh (Middle order / Part-time spin); 5. L A Pommersbach (Finisher); 6. J R Hopes (Pace all-rounder); 7. I K Pathan (Pace all-rounder); 8. P P Chawla (Spinner); 9. B Lee (Pacer); 10. V R Singh (Pacer); 11. S Sreesanth (Pacer) | K C Sangakkara | 5 | 2 |
+| Rajasthan Royals | 1. G C Smith (Opener); 2. S A Asnodkar (Opener); 3. S R Watson (Top order / Pace all-rounder); 4. Y K Pathan (Finisher / Spin all-rounder); 5. M Kaif (Middle order); 6. Kamran Akmal (WK / Middle order); 7. R A Jadeja (Finisher / Spin); 8. S K Warne (Spinner); 9. Sohail Tanvir (Pacer); 10. M M Patel (Pacer); 11. S K Trivedi (Pacer) | Kamran Akmal | 4 | 3 |
+| Royal Challengers Bengaluru | 1. R Dravid (Opener / Top order); 2. W Jaffer (Opener); 3. J H Kallis (Top order / Pace all-rounder); 4. M V Boucher (WK / Middle order); 5. L R P L Taylor (Finisher); 6. Misbah-ul-Haq (Finisher); 7. P Kumar (Pace all-rounder); 8. Z Khan (Pacer); 9. D W Steyn (Pacer); 10. A Kumble (Spinner); 11. R Vinay Kumar (Pacer) | M V Boucher | 5 | 1 |
 
 ## 2008 Batting Performances — All Teams
 
@@ -282,180 +293,244 @@ Source: uploaded 2008 batting performance table and uploaded 2008 bowling perfor
 | 97 | A Symonds | Deccan Chargers | 4 | 3 | 6.5 | 0 | 101 | 0 | 0/20 | 0 |  |  | 14.78 |
 | 98 | L P C Silva | Deccan Chargers | 3 | 1 | 1.0 | 0 | 21 | 0 | 0/21 | 0 |  |  | 21.00 |
 
-## Best Possible XI by Team
+## Best Possible XI by Team — Role Balanced
 
 ### Chennai Super Kings
 
-**Playing XI:** 1. S K Raina, 2. M S Dhoni, 3. J A Morkel, 4. M E K Hussey, 5. P A Patel, 6. S Badrinath, 7. M L Hayden, 8. M Gony, 9. M Ntini, 10. L Balaji, 11. M Muralitharan
+**Playing XI by role:**
 
-**Balance:** 6 bowling options; wicketkeeper candidate(s): M S Dhoni, P A Patel.
+1. **M L Hayden** — Opener
+2. **P A Patel** — Opener / WK
+3. **M E K Hussey** — Top-order anchor
+4. **S K Raina** — Middle order
+5. **M S Dhoni** — WK / Finisher
+6. **S Badrinath** — Middle order / Finisher
+7. **J A Morkel** — Pace all-rounder / Finisher
+8. **M Gony** — Pacer
+9. **L Balaji** — Pacer
+10. **M Muralitharan** — Spinner
+11. **M Ntini** — Pacer
 
-| XI | Player | Bat Mat | Bat Inns | Bat NO | Bat 50s | Bat 100s | Bat 0s | Bat 4s | Bat 6s | Bat HS | Bat Runs | Bat B/F | Bat S/R | Bat Avg | Bat Ca | Bat St | Bat % Team Runs | Bowl Mat | Bowl Inns | Bowl O | Bowl M | Bowl R | Bowl W | Bowl Best | Bowl 4w | Bowl Avg | Bowl S/R | Bowl E/R |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | S K Raina | 16 | 14 | 3 | 3 | 0 | 0 | 35 | 18 | 55* | 421 | 295 | 142.71 | 38.27 | 10 | 0 | 16.71% | 16 | 2 | 3.2 | 0 | 30 | 1 | 1/20 | 0 | 30.00 | 20.00 | 9.00 |
-| 2 | M S Dhoni | 16 | 14 | 4 | 2 | 0 | 0 | 38 | 15 | 65 | 414 | 310 | 133.55 | 41.40 | 6 | 0 | 16.43% |  |  |  |  |  |  |  |  |  |  |  |
-| 3 | J A Morkel | 13 | 10 | 3 | 1 | 0 | 0 | 18 | 14 | 71 | 241 | 163 | 147.85 | 34.43 | 3 | 0 | 9.56% | 13 | 13 | 48.0 | 0 | 399 | 17 | 4/32 | 1 | 23.47 | 16.94 | 8.31 |
-| 4 | M E K Hussey | 4 | 3 | 1 | 0 | 1 | 0 | 12 | 11 | 116* | 168 | 100 | 168.00 | 84.00 | 2 | 0 | 6.67% |  |  |  |  |  |  |  |  |  |  |  |
-| 5 | P A Patel | 13 | 13 | 2 | 2 | 0 | 1 | 42 | 3 | 54 | 302 | 297 | 101.68 | 27.45 | 6 | 0 | 11.98% |  |  |  |  |  |  |  |  |  |  |  |
-| 6 | S Badrinath | 16 | 11 | 5 | 2 | 0 | 1 | 21 | 8 | 64 | 192 | 130 | 147.69 | 32.00 | 5 | 0 | 7.62% |  |  |  |  |  |  |  |  |  |  |  |
-| 7 | M L Hayden | 4 | 4 | 1 | 2 | 0 | 0 | 24 | 6 | 81 | 189 | 131 | 144.27 | 63.00 | 0 | 0 | 7.50% |  |  |  |  |  |  |  |  |  |  |  |
-| 8 | M Gony | 16 | 5 | 4 | 0 | 0 | 0 | 2 | 3 | 15* | 35 | 23 | 152.17 | 35.00 | 2 | 0 | 1.39% | 16 | 16 | 60.0 | 3 | 443 | 17 | 3/34 | 0 | 26.06 | 21.18 | 7.38 |
-| 9 | M Ntini | 9 | 2 | 1 | 0 | 0 | 0 | 2 | 0 | 11 | 11 | 18 | 61.11 | 11.00 | 1 | 0 | 0.44% | 9 | 9 | 35.0 | 2 | 242 | 7 | 4/21 | 1 | 34.57 | 30.00 | 6.91 |
-| 10 | L Balaji | 9 | 1 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 4 | 0.00 | 0.00 | 1 | 0 |  | 9 | 9 | 33.0 | 0 | 286 | 11 | 5/24 | 1 | 26.00 | 18.00 | 8.67 |
-| 11 | M Muralitharan | 15 | 1 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 3 | 0.00 | 0.00 | 4 | 0 |  | 15 | 15 | 58.0 | 0 | 393 | 11 | 2/29 | 0 | 35.73 | 31.64 | 6.78 |
-
-**Closest exclusions:** S Vidyut, Joginder Sharma, J D P Oram
+| XI | Role | Player | Bat Mat | Bat Inns | Bat NO | Bat 50s | Bat 100s | Bat 0s | Bat 4s | Bat 6s | Bat HS | Bat Runs | Bat B/F | Bat S/R | Bat Avg | Bat Ca | Bat St | Bat % Team Runs | Bowl Mat | Bowl Inns | Bowl O | Bowl M | Bowl R | Bowl W | Bowl Best | Bowl 4w | Bowl Avg | Bowl S/R | Bowl E/R |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | Opener | M L Hayden | 4 | 4 | 1 | 2 | 0 | 0 | 24 | 6 | 81 | 189 | 131 | 144.27 | 63.00 | 0 | 0 | 7.50% |  |  |  |  |  |  |  |  |  |  |  |
+| 2 | Opener / WK | P A Patel | 13 | 13 | 2 | 2 | 0 | 1 | 42 | 3 | 54 | 302 | 297 | 101.68 | 27.45 | 6 | 0 | 11.98% |  |  |  |  |  |  |  |  |  |  |  |
+| 3 | Top-order anchor | M E K Hussey | 4 | 3 | 1 | 0 | 1 | 0 | 12 | 11 | 116* | 168 | 100 | 168.00 | 84.00 | 2 | 0 | 6.67% |  |  |  |  |  |  |  |  |  |  |  |
+| 4 | Middle order | S K Raina | 16 | 14 | 3 | 3 | 0 | 0 | 35 | 18 | 55* | 421 | 295 | 142.71 | 38.27 | 10 | 0 | 16.71% | 16 | 2 | 3.2 | 0 | 30 | 1 | 1/20 | 0 | 30.00 | 20.00 | 9.00 |
+| 5 | WK / Finisher | M S Dhoni | 16 | 14 | 4 | 2 | 0 | 0 | 38 | 15 | 65 | 414 | 310 | 133.55 | 41.40 | 6 | 0 | 16.43% |  |  |  |  |  |  |  |  |  |  |  |
+| 6 | Middle order / Finisher | S Badrinath | 16 | 11 | 5 | 2 | 0 | 1 | 21 | 8 | 64 | 192 | 130 | 147.69 | 32.00 | 5 | 0 | 7.62% |  |  |  |  |  |  |  |  |  |  |  |
+| 7 | Pace all-rounder / Finisher | J A Morkel | 13 | 10 | 3 | 1 | 0 | 0 | 18 | 14 | 71 | 241 | 163 | 147.85 | 34.43 | 3 | 0 | 9.56% | 13 | 13 | 48.0 | 0 | 399 | 17 | 4/32 | 1 | 23.47 | 16.94 | 8.31 |
+| 8 | Pacer | M Gony | 16 | 5 | 4 | 0 | 0 | 0 | 2 | 3 | 15* | 35 | 23 | 152.17 | 35.00 | 2 | 0 | 1.39% | 16 | 16 | 60.0 | 3 | 443 | 17 | 3/34 | 0 | 26.06 | 21.18 | 7.38 |
+| 9 | Pacer | L Balaji | 9 | 1 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 4 | 0.00 | 0.00 | 1 | 0 |  | 9 | 9 | 33.0 | 0 | 286 | 11 | 5/24 | 1 | 26.00 | 18.00 | 8.67 |
+| 10 | Spinner | M Muralitharan | 15 | 1 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 3 | 0.00 | 0.00 | 4 | 0 |  | 15 | 15 | 58.0 | 0 | 393 | 11 | 2/29 | 0 | 35.73 | 31.64 | 6.78 |
+| 11 | Pacer | M Ntini | 9 | 2 | 1 | 0 | 0 | 0 | 2 | 0 | 11 | 11 | 18 | 61.11 | 11.00 | 1 | 0 | 0.44% | 9 | 9 | 35.0 | 2 | 242 | 7 | 4/21 | 1 | 34.57 | 30.00 | 6.91 |
 
 ### Deccan Chargers
 
-**Playing XI:** 1. A C Gilchrist, 2. R G Sharma, 3. Y Venugopal Rao, 4. A Symonds, 5. H H Gibbs, 6. V V S Laxman, 7. Shahid Afridi, 8. R P Singh, 9. W P U J C Vaas, 10. D P Vijaykumar, 11. P P Ojha
+**Playing XI by role:**
 
-**Balance:** 8 bowling options; wicketkeeper candidate(s): A C Gilchrist.
+1. **A C Gilchrist** — Opener / WK
+2. **H H Gibbs** — Opener
+3. **V V S Laxman** — Top-order anchor
+4. **R G Sharma** — Middle order / Part-time spin
+5. **A Symonds** — Middle order / Finisher
+6. **Y Venugopal Rao** — Middle order
+7. **Shahid Afridi** — Spin all-rounder / Finisher
+8. **W P U J C Vaas** — Pacer
+9. **R P Singh** — Pacer
+10. **P P Ojha** — Spinner
+11. **D P Vijaykumar** — Pacer
 
-| XI | Player | Bat Mat | Bat Inns | Bat NO | Bat 50s | Bat 100s | Bat 0s | Bat 4s | Bat 6s | Bat HS | Bat Runs | Bat B/F | Bat S/R | Bat Avg | Bat Ca | Bat St | Bat % Team Runs | Bowl Mat | Bowl Inns | Bowl O | Bowl M | Bowl R | Bowl W | Bowl Best | Bowl 4w | Bowl Avg | Bowl S/R | Bowl E/R |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | A C Gilchrist | 14 | 14 | 1 | 3 | 1 | 0 | 51 | 19 | 109* | 436 | 318 | 137.11 | 33.54 | 6 | 1 | 19.56% |  |  |  |  |  |  |  |  |  |  |  |
-| 2 | R G Sharma | 13 | 12 | 1 | 4 | 0 | 1 | 38 | 19 | 76* | 404 | 273 | 147.99 | 36.73 | 8 | 0 | 18.12% | 13 | 1 | 4.0 | 0 | 25 | 1 | 1/25 | 0 | 25.00 | 24.00 | 6.25 |
-| 3 | Y Venugopal Rao | 11 | 10 | 2 | 2 | 0 | 0 | 22 | 15 | 71* | 288 | 210 | 137.14 | 36.00 | 0 | 0 | 12.92% | 11 | 7 | 14.0 | 0 | 137 | 2 | 2/25 | 0 | 68.50 | 42.00 | 9.79 |
-| 4 | A Symonds | 4 | 3 | 1 | 0 | 1 | 0 | 15 | 9 | 117* | 161 | 105 | 153.33 | 80.50 | 3 | 0 | 7.22% | 4 | 3 | 6.5 | 0 | 101 | 0 | 0/20 | 0 |  |  | 14.78 |
-| 5 | H H Gibbs | 9 | 9 | 0 | 0 | 0 | 0 | 17 | 8 | 47 | 167 | 153 | 109.15 | 18.56 | 5 | 0 | 7.49% |  |  |  |  |  |  |  |  |  |  |  |
-| 6 | V V S Laxman | 6 | 6 | 1 | 1 | 0 | 1 | 22 | 1 | 52 | 155 | 132 | 117.42 | 31.00 | 1 | 0 | 6.95% |  |  |  |  |  |  |  |  |  |  |  |
-| 7 | Shahid Afridi | 10 | 9 | 1 | 0 | 0 | 1 | 7 | 5 | 33 | 81 | 46 | 176.09 | 10.13 | 4 | 0 | 3.63% | 10 | 10 | 30.0 | 0 | 225 | 9 | 3/28 | 0 | 25.00 | 20.00 | 7.50 |
-| 8 | R P Singh | 14 | 9 | 5 | 0 | 0 | 0 | 2 | 1 | 10 | 27 | 24 | 112.50 | 6.75 | 5 | 0 | 1.21% | 14 | 14 | 51.2 | 1 | 442 | 15 | 3/35 | 0 | 29.47 | 20.53 | 8.61 |
-| 9 | W P U J C Vaas | 5 | 4 | 1 | 0 | 0 | 2 | 0 | 1 | 12* | 21 | 18 | 116.67 | 7.00 | 0 | 0 | 0.94% | 5 | 5 | 17.0 | 0 | 145 | 5 | 2/9 | 0 | 29.00 | 20.40 | 8.53 |
-| 10 | D P Vijaykumar | 9 | 2 | 2 | 0 | 0 | 0 | 0 | 0 | 1* | 1 | 1 | 100.00 |  | 0 | 0 | 0.04% | 9 | 9 | 25.2 | 0 | 199 | 4 | 1/17 | 0 | 49.75 | 38.00 | 7.86 |
-| 11 | P P Ojha | 13 | 4 | 2 | 0 | 0 | 2 | 0 | 0 | 1* | 2 | 4 | 50.00 | 1.00 | 3 | 0 | 0.09% | 13 | 12 | 37.0 | 0 | 284 | 11 | 2/18 | 0 | 25.82 | 20.18 | 7.68 |
-
-**Closest exclusions:** D B Ravi Teja, S B Styris, S B Bangar
+| XI | Role | Player | Bat Mat | Bat Inns | Bat NO | Bat 50s | Bat 100s | Bat 0s | Bat 4s | Bat 6s | Bat HS | Bat Runs | Bat B/F | Bat S/R | Bat Avg | Bat Ca | Bat St | Bat % Team Runs | Bowl Mat | Bowl Inns | Bowl O | Bowl M | Bowl R | Bowl W | Bowl Best | Bowl 4w | Bowl Avg | Bowl S/R | Bowl E/R |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | Opener / WK | A C Gilchrist | 14 | 14 | 1 | 3 | 1 | 0 | 51 | 19 | 109* | 436 | 318 | 137.11 | 33.54 | 6 | 1 | 19.56% |  |  |  |  |  |  |  |  |  |  |  |
+| 2 | Opener | H H Gibbs | 9 | 9 | 0 | 0 | 0 | 0 | 17 | 8 | 47 | 167 | 153 | 109.15 | 18.56 | 5 | 0 | 7.49% |  |  |  |  |  |  |  |  |  |  |  |
+| 3 | Top-order anchor | V V S Laxman | 6 | 6 | 1 | 1 | 0 | 1 | 22 | 1 | 52 | 155 | 132 | 117.42 | 31.00 | 1 | 0 | 6.95% |  |  |  |  |  |  |  |  |  |  |  |
+| 4 | Middle order / Part-time spin | R G Sharma | 13 | 12 | 1 | 4 | 0 | 1 | 38 | 19 | 76* | 404 | 273 | 147.99 | 36.73 | 8 | 0 | 18.12% | 13 | 1 | 4.0 | 0 | 25 | 1 | 1/25 | 0 | 25.00 | 24.00 | 6.25 |
+| 5 | Middle order / Finisher | A Symonds | 4 | 3 | 1 | 0 | 1 | 0 | 15 | 9 | 117* | 161 | 105 | 153.33 | 80.50 | 3 | 0 | 7.22% | 4 | 3 | 6.5 | 0 | 101 | 0 | 0/20 | 0 |  |  | 14.78 |
+| 6 | Middle order | Y Venugopal Rao | 11 | 10 | 2 | 2 | 0 | 0 | 22 | 15 | 71* | 288 | 210 | 137.14 | 36.00 | 0 | 0 | 12.92% | 11 | 7 | 14.0 | 0 | 137 | 2 | 2/25 | 0 | 68.50 | 42.00 | 9.79 |
+| 7 | Spin all-rounder / Finisher | Shahid Afridi | 10 | 9 | 1 | 0 | 0 | 1 | 7 | 5 | 33 | 81 | 46 | 176.09 | 10.13 | 4 | 0 | 3.63% | 10 | 10 | 30.0 | 0 | 225 | 9 | 3/28 | 0 | 25.00 | 20.00 | 7.50 |
+| 8 | Pacer | W P U J C Vaas | 5 | 4 | 1 | 0 | 0 | 2 | 0 | 1 | 12* | 21 | 18 | 116.67 | 7.00 | 0 | 0 | 0.94% | 5 | 5 | 17.0 | 0 | 145 | 5 | 2/9 | 0 | 29.00 | 20.40 | 8.53 |
+| 9 | Pacer | R P Singh | 14 | 9 | 5 | 0 | 0 | 0 | 2 | 1 | 10 | 27 | 24 | 112.50 | 6.75 | 5 | 0 | 1.21% | 14 | 14 | 51.2 | 1 | 442 | 15 | 3/35 | 0 | 29.47 | 20.53 | 8.61 |
+| 10 | Spinner | P P Ojha | 13 | 4 | 2 | 0 | 0 | 2 | 0 | 0 | 1* | 2 | 4 | 50.00 | 1.00 | 3 | 0 | 0.09% | 13 | 12 | 37.0 | 0 | 284 | 11 | 2/18 | 0 | 25.82 | 20.18 | 7.68 |
+| 11 | Pacer | D P Vijaykumar | 9 | 2 | 2 | 0 | 0 | 0 | 0 | 0 | 1* | 1 | 1 | 100.00 |  | 0 | 0 | 0.04% | 9 | 9 | 25.2 | 0 | 199 | 4 | 1/17 | 0 | 49.75 | 38.00 | 7.86 |
 
 ### Delhi Capitals
 
-**Playing XI:** 1. G Gambhir, 2. V Sehwag, 3. S Dhawan, 4. M F Maharoof, 5. K D Karthik, 6. M K Tiwary, 7. T M Dilshan, 8. A B de Villiers, 9. A Mishra, 10. V Y Mahesh, 11. G D McGrath
+**Playing XI by role:**
 
-**Balance:** 6 bowling options; wicketkeeper candidate(s): K D Karthik.
+1. **G Gambhir** — Opener
+2. **V Sehwag** — Opener / Part-time spin
+3. **S Dhawan** — Top order
+4. **A B de Villiers** — Middle order
+5. **T M Dilshan** — Middle order / Part-time spin
+6. **K D Karthik** — WK / Finisher
+7. **M F Maharoof** — Pace all-rounder
+8. **A Mishra** — Spinner
+9. **V Y Mahesh** — Pacer
+10. **G D McGrath** — Pacer
+11. **Mohammad Asif** — Pacer
 
-| XI | Player | Bat Mat | Bat Inns | Bat NO | Bat 50s | Bat 100s | Bat 0s | Bat 4s | Bat 6s | Bat HS | Bat Runs | Bat B/F | Bat S/R | Bat Avg | Bat Ca | Bat St | Bat % Team Runs | Bowl Mat | Bowl Inns | Bowl O | Bowl M | Bowl R | Bowl W | Bowl Best | Bowl 4w | Bowl Avg | Bowl S/R | Bowl E/R |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | G Gambhir | 14 | 14 | 1 | 5 | 0 | 0 | 68 | 8 | 86 | 534 | 379 | 140.90 | 41.08 | 2 | 0 | 25.21% |  |  |  |  |  |  |  |  |  |  |  |
-| 2 | V Sehwag | 14 | 14 | 2 | 3 | 0 | 2 | 46 | 21 | 94* | 406 | 220 | 184.55 | 33.83 | 3 | 0 | 19.17% | 14 | 7 | 11.0 | 0 | 133 | 3 | 1/2 | 0 | 44.33 | 22.00 | 12.09 |
-| 3 | S Dhawan | 14 | 14 | 5 | 4 | 0 | 1 | 35 | 8 | 68* | 340 | 295 | 115.25 | 37.78 | 8 | 0 | 16.05% |  |  |  |  |  |  |  |  |  |  |  |
-| 4 | M F Maharoof | 10 | 8 | 2 | 0 | 0 | 1 | 9 | 7 | 39 | 125 | 79 | 158.23 | 20.83 | 3 | 0 | 5.90% | 10 | 10 | 36.0 | 0 | 249 | 15 | 3/34 | 0 | 16.60 | 14.40 | 6.92 |
-| 5 | K D Karthik | 13 | 8 | 2 | 1 | 0 | 0 | 13 | 4 | 56* | 145 | 107 | 135.51 | 24.17 | 6 | 2 | 6.85% |  |  |  |  |  |  |  |  |  |  |  |
-| 6 | M K Tiwary | 9 | 7 | 3 | 0 | 0 | 1 | 16 | 0 | 39 | 104 | 85 | 122.35 | 26.00 | 3 | 0 | 4.91% |  |  |  |  |  |  |  |  |  |  |  |
-| 7 | T M Dilshan | 7 | 7 | 1 | 0 | 0 | 1 | 14 | 3 | 33 | 104 | 79 | 131.65 | 17.33 | 5 | 0 | 4.91% | 7 | 1 | 1.0 | 0 | 3 | 1 | 1/3 | 0 | 3.00 | 6.00 | 3.00 |
-| 8 | A B de Villiers | 6 | 6 | 1 | 0 | 0 | 1 | 5 | 1 | 26* | 95 | 98 | 96.94 | 19.00 | 3 | 0 | 4.49% |  |  |  |  |  |  |  |  |  |  |  |
-| 9 | A Mishra | 6 | 3 | 0 | 0 | 0 | 0 | 3 | 0 | 31 | 37 | 42 | 88.10 | 12.33 | 0 | 0 | 1.75% | 6 | 6 | 20.0 | 0 | 138 | 11 | 5/17 | 1 | 12.55 | 10.91 | 6.90 |
-| 10 | V Y Mahesh | 11 | 5 | 3 | 0 | 0 | 0 | 0 | 0 | 6* | 15 | 27 | 55.56 | 7.50 | 5 | 0 | 0.71% | 11 | 11 | 42.1 | 0 | 370 | 16 | 4/36 | 1 | 23.13 | 15.81 | 8.77 |
-| 11 | G D McGrath | 14 | 3 | 2 | 0 | 0 | 1 | 1 | 0 | 4* | 4 | 5 | 80.00 | 4.00 | 2 | 0 | 0.19% | 14 | 14 | 54.0 | 2 | 357 | 12 | 4/29 | 1 | 29.75 | 27.00 | 6.61 |
-
-**Closest exclusions:** R Bhatia, Mohammad Asif, Shoaib Malik
+| XI | Role | Player | Bat Mat | Bat Inns | Bat NO | Bat 50s | Bat 100s | Bat 0s | Bat 4s | Bat 6s | Bat HS | Bat Runs | Bat B/F | Bat S/R | Bat Avg | Bat Ca | Bat St | Bat % Team Runs | Bowl Mat | Bowl Inns | Bowl O | Bowl M | Bowl R | Bowl W | Bowl Best | Bowl 4w | Bowl Avg | Bowl S/R | Bowl E/R |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | Opener | G Gambhir | 14 | 14 | 1 | 5 | 0 | 0 | 68 | 8 | 86 | 534 | 379 | 140.90 | 41.08 | 2 | 0 | 25.21% |  |  |  |  |  |  |  |  |  |  |  |
+| 2 | Opener / Part-time spin | V Sehwag | 14 | 14 | 2 | 3 | 0 | 2 | 46 | 21 | 94* | 406 | 220 | 184.55 | 33.83 | 3 | 0 | 19.17% | 14 | 7 | 11.0 | 0 | 133 | 3 | 1/2 | 0 | 44.33 | 22.00 | 12.09 |
+| 3 | Top order | S Dhawan | 14 | 14 | 5 | 4 | 0 | 1 | 35 | 8 | 68* | 340 | 295 | 115.25 | 37.78 | 8 | 0 | 16.05% |  |  |  |  |  |  |  |  |  |  |  |
+| 4 | Middle order | A B de Villiers | 6 | 6 | 1 | 0 | 0 | 1 | 5 | 1 | 26* | 95 | 98 | 96.94 | 19.00 | 3 | 0 | 4.49% |  |  |  |  |  |  |  |  |  |  |  |
+| 5 | Middle order / Part-time spin | T M Dilshan | 7 | 7 | 1 | 0 | 0 | 1 | 14 | 3 | 33 | 104 | 79 | 131.65 | 17.33 | 5 | 0 | 4.91% | 7 | 1 | 1.0 | 0 | 3 | 1 | 1/3 | 0 | 3.00 | 6.00 | 3.00 |
+| 6 | WK / Finisher | K D Karthik | 13 | 8 | 2 | 1 | 0 | 0 | 13 | 4 | 56* | 145 | 107 | 135.51 | 24.17 | 6 | 2 | 6.85% |  |  |  |  |  |  |  |  |  |  |  |
+| 7 | Pace all-rounder | M F Maharoof | 10 | 8 | 2 | 0 | 0 | 1 | 9 | 7 | 39 | 125 | 79 | 158.23 | 20.83 | 3 | 0 | 5.90% | 10 | 10 | 36.0 | 0 | 249 | 15 | 3/34 | 0 | 16.60 | 14.40 | 6.92 |
+| 8 | Spinner | A Mishra | 6 | 3 | 0 | 0 | 0 | 0 | 3 | 0 | 31 | 37 | 42 | 88.10 | 12.33 | 0 | 0 | 1.75% | 6 | 6 | 20.0 | 0 | 138 | 11 | 5/17 | 1 | 12.55 | 10.91 | 6.90 |
+| 9 | Pacer | V Y Mahesh | 11 | 5 | 3 | 0 | 0 | 0 | 0 | 0 | 6* | 15 | 27 | 55.56 | 7.50 | 5 | 0 | 0.71% | 11 | 11 | 42.1 | 0 | 370 | 16 | 4/36 | 1 | 23.13 | 15.81 | 8.77 |
+| 10 | Pacer | G D McGrath | 14 | 3 | 2 | 0 | 0 | 1 | 1 | 0 | 4* | 4 | 5 | 80.00 | 4.00 | 2 | 0 | 0.19% | 14 | 14 | 54.0 | 2 | 357 | 12 | 4/29 | 1 | 29.75 | 27.00 | 6.61 |
+| 11 | Pacer | Mohammad Asif | 8 | 2 | 0 | 0 | 0 | 1 | 0 | 0 | 3 | 3 | 6 | 50.00 | 1.50 | 1 | 0 | 0.14% | 8 | 8 | 32.0 | 0 | 296 | 8 | 2/19 | 0 | 37.00 | 24.00 | 9.25 |
 
 ### Kolkata Knight Riders
 
-**Playing XI:** 1. S C Ganguly, 2. D J Hussey, 3. B B McCullum, 4. W P Saha, 5. L R Shukla, 6. Salman Butt, 7. D B Das, 8. Umar Gul, 9. A B Agarkar, 10. A B Dinda, 11. Shoaib Akhtar
+**Playing XI by role:**
 
-**Balance:** 7 bowling options; wicketkeeper candidate(s): W P Saha.
+1. **B B McCullum** — Opener
+2. **Salman Butt** — Opener
+3. **S C Ganguly** — Top order / Medium pace
+4. **D J Hussey** — Middle order
+5. **W P Saha** — WK / Middle order
+6. **L R Shukla** — Finisher / Medium pace
+7. **A B Agarkar** — Pace all-rounder
+8. **Umar Gul** — Pacer
+9. **A B Dinda** — Pacer
+10. **M Kartik** — Spinner
+11. **I Sharma** — Pacer
 
-| XI | Player | Bat Mat | Bat Inns | Bat NO | Bat 50s | Bat 100s | Bat 0s | Bat 4s | Bat 6s | Bat HS | Bat Runs | Bat B/F | Bat S/R | Bat Avg | Bat Ca | Bat St | Bat % Team Runs | Bowl Mat | Bowl Inns | Bowl O | Bowl M | Bowl R | Bowl W | Bowl Best | Bowl 4w | Bowl Avg | Bowl S/R | Bowl E/R |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | S C Ganguly | 13 | 13 | 1 | 3 | 0 | 0 | 33 | 15 | 91 | 349 | 307 | 113.68 | 29.08 | 5 | 0 | 17.97% | 13 | 7 | 20.0 | 0 | 128 | 6 | 2/21 | 0 | 21.33 | 20.00 | 6.40 |
-| 2 | D J Hussey | 13 | 13 | 2 | 2 | 0 | 2 | 18 | 17 | 71 | 319 | 259 | 123.17 | 29.00 | 5 | 0 | 16.43% | 13 | 5 | 13.0 | 0 | 130 | 2 | 1/23 | 0 | 65.00 | 39.00 | 10.00 |
-| 3 | B B McCullum | 4 | 4 | 1 | 0 | 1 | 0 | 13 | 15 | 158* | 188 | 92 | 204.35 | 62.67 | 1 | 0 | 9.68% |  |  |  |  |  |  |  |  |  |  |  |
-| 4 | W P Saha | 12 | 10 | 5 | 1 | 0 | 0 | 12 | 7 | 59* | 159 | 119 | 133.61 | 31.80 | 8 | 2 | 8.19% |  |  |  |  |  |  |  |  |  |  |  |
-| 5 | L R Shukla | 13 | 12 | 4 | 0 | 0 | 1 | 17 | 4 | 42 | 163 | 122 | 133.61 | 20.38 | 2 | 0 | 8.39% | 13 | 9 | 12.0 | 0 | 124 | 6 | 3/6 | 0 | 20.67 | 12.00 | 10.33 |
-| 6 | Salman Butt | 7 | 7 | 0 | 1 | 0 | 0 | 30 | 2 | 73 | 193 | 161 | 119.88 | 27.57 | 2 | 0 | 9.94% |  |  |  |  |  |  |  |  |  |  |  |
-| 7 | D B Das | 6 | 6 | 0 | 0 | 0 | 1 | 9 | 5 | 31 | 103 | 94 | 109.57 | 17.17 | 0 | 0 | 5.30% |  |  |  |  |  |  |  |  |  |  |  |
-| 8 | Umar Gul | 6 | 4 | 1 | 0 | 0 | 0 | 1 | 5 | 24 | 39 | 19 | 205.26 | 13.00 | 0 | 0 | 2.01% | 6 | 6 | 22.3 | 1 | 184 | 12 | 4/23 | 1 | 15.33 | 11.25 | 8.18 |
-| 9 | A B Agarkar | 9 | 6 | 1 | 0 | 0 | 0 | 5 | 2 | 20 | 54 | 46 | 117.39 | 10.80 | 1 | 0 | 2.78% | 9 | 9 | 26.0 | 0 | 207 | 8 | 3/25 | 0 | 25.88 | 19.50 | 7.96 |
-| 10 | A B Dinda | 13 | 3 | 2 | 0 | 0 | 0 | 0 | 0 | 1* | 2 | 4 | 50.00 | 2.00 | 1 | 0 | 0.10% | 13 | 12 | 39.0 | 0 | 260 | 9 | 3/33 | 0 | 28.89 | 26.00 | 6.67 |
-| 11 | Shoaib Akhtar | 3 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 2 | 7 | 28.57 | 2.00 | 0 | 0 | 0.10% | 3 | 3 | 7.0 | 0 | 54 | 5 | 4/11 | 1 | 10.80 | 8.40 | 7.71 |
-
-**Closest exclusions:** I Sharma, Mohammad Hafeez, M Kartik
+| XI | Role | Player | Bat Mat | Bat Inns | Bat NO | Bat 50s | Bat 100s | Bat 0s | Bat 4s | Bat 6s | Bat HS | Bat Runs | Bat B/F | Bat S/R | Bat Avg | Bat Ca | Bat St | Bat % Team Runs | Bowl Mat | Bowl Inns | Bowl O | Bowl M | Bowl R | Bowl W | Bowl Best | Bowl 4w | Bowl Avg | Bowl S/R | Bowl E/R |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | Opener | B B McCullum | 4 | 4 | 1 | 0 | 1 | 0 | 13 | 15 | 158* | 188 | 92 | 204.35 | 62.67 | 1 | 0 | 9.68% |  |  |  |  |  |  |  |  |  |  |  |
+| 2 | Opener | Salman Butt | 7 | 7 | 0 | 1 | 0 | 0 | 30 | 2 | 73 | 193 | 161 | 119.88 | 27.57 | 2 | 0 | 9.94% |  |  |  |  |  |  |  |  |  |  |  |
+| 3 | Top order / Medium pace | S C Ganguly | 13 | 13 | 1 | 3 | 0 | 0 | 33 | 15 | 91 | 349 | 307 | 113.68 | 29.08 | 5 | 0 | 17.97% | 13 | 7 | 20.0 | 0 | 128 | 6 | 2/21 | 0 | 21.33 | 20.00 | 6.40 |
+| 4 | Middle order | D J Hussey | 13 | 13 | 2 | 2 | 0 | 2 | 18 | 17 | 71 | 319 | 259 | 123.17 | 29.00 | 5 | 0 | 16.43% | 13 | 5 | 13.0 | 0 | 130 | 2 | 1/23 | 0 | 65.00 | 39.00 | 10.00 |
+| 5 | WK / Middle order | W P Saha | 12 | 10 | 5 | 1 | 0 | 0 | 12 | 7 | 59* | 159 | 119 | 133.61 | 31.80 | 8 | 2 | 8.19% |  |  |  |  |  |  |  |  |  |  |  |
+| 6 | Finisher / Medium pace | L R Shukla | 13 | 12 | 4 | 0 | 0 | 1 | 17 | 4 | 42 | 163 | 122 | 133.61 | 20.38 | 2 | 0 | 8.39% | 13 | 9 | 12.0 | 0 | 124 | 6 | 3/6 | 0 | 20.67 | 12.00 | 10.33 |
+| 7 | Pace all-rounder | A B Agarkar | 9 | 6 | 1 | 0 | 0 | 0 | 5 | 2 | 20 | 54 | 46 | 117.39 | 10.80 | 1 | 0 | 2.78% | 9 | 9 | 26.0 | 0 | 207 | 8 | 3/25 | 0 | 25.88 | 19.50 | 7.96 |
+| 8 | Pacer | Umar Gul | 6 | 4 | 1 | 0 | 0 | 0 | 1 | 5 | 24 | 39 | 19 | 205.26 | 13.00 | 0 | 0 | 2.01% | 6 | 6 | 22.3 | 1 | 184 | 12 | 4/23 | 1 | 15.33 | 11.25 | 8.18 |
+| 9 | Pacer | A B Dinda | 13 | 3 | 2 | 0 | 0 | 0 | 0 | 0 | 1* | 2 | 4 | 50.00 | 2.00 | 1 | 0 | 0.10% | 13 | 12 | 39.0 | 0 | 260 | 9 | 3/33 | 0 | 28.89 | 26.00 | 6.67 |
+| 10 | Spinner | M Kartik | 6 | 3 | 0 | 0 | 0 | 0 | 3 | 0 | 17 | 30 | 27 | 111.11 | 10.00 | 4 | 0 | 1.54% | 6 | 5 | 14.4 | 0 | 127 | 3 | 3/17 | 0 | 42.33 | 29.33 | 8.66 |
+| 11 | Pacer | I Sharma | 13 | 6 | 5 | 0 | 0 | 0 | 1 | 0 | 4* | 11 | 11 | 100.00 | 11.00 | 2 | 0 | 0.57% | 13 | 13 | 42.1 | 1 | 329 | 7 | 1/7 | 0 | 47.00 | 36.14 | 7.80 |
 
 ### Mumbai Indians
 
-**Playing XI:** 1. S T Jayasuriya, 2. R V Uthappa, 3. A M Nayar, 4. D J J Bravo, 5. S R Tendulkar, 6. S M Pollock, 7. Y V Takawale, 8. Harbhajan Singh, 9. C R D Fernando, 10. A Nehra, 11. D S Kulkarni
+**Playing XI by role:**
 
-**Balance:** 8 bowling options; wicketkeeper candidate(s): Y V Takawale.
+1. **S T Jayasuriya** — Opener / Spin
+2. **S R Tendulkar** — Opener
+3. **R V Uthappa** — Top order
+4. **D J J Bravo** — Middle order / Pace all-rounder
+5. **A M Nayar** — Finisher / Medium pace
+6. **S M Pollock** — Pace all-rounder
+7. **Y V Takawale** — WK
+8. **Harbhajan Singh** — Spinner
+9. **C R D Fernando** — Pacer
+10. **A Nehra** — Pacer
+11. **D S Kulkarni** — Pacer
 
-| XI | Player | Bat Mat | Bat Inns | Bat NO | Bat 50s | Bat 100s | Bat 0s | Bat 4s | Bat 6s | Bat HS | Bat Runs | Bat B/F | Bat S/R | Bat Avg | Bat Ca | Bat St | Bat % Team Runs | Bowl Mat | Bowl Inns | Bowl O | Bowl M | Bowl R | Bowl W | Bowl Best | Bowl 4w | Bowl Avg | Bowl S/R | Bowl E/R |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | S T Jayasuriya | 14 | 14 | 2 | 2 | 1 | 0 | 57 | 31 | 114* | 514 | 309 | 166.34 | 42.83 | 2 | 0 | 24.71% | 14 | 8 | 21.0 | 1 | 159 | 4 | 3/14 | 0 | 39.75 | 31.50 | 7.57 |
-| 2 | R V Uthappa | 14 | 14 | 5 | 0 | 0 | 0 | 34 | 9 | 48 | 320 | 279 | 114.70 | 35.56 | 9 | 0 | 15.38% |  |  |  |  |  |  |  |  |  |  |  |
-| 3 | A M Nayar | 14 | 10 | 2 | 0 | 0 | 0 | 16 | 9 | 45* | 206 | 138 | 149.28 | 25.75 | 4 | 0 | 9.90% | 14 | 5 | 7.0 | 0 | 68 | 1 | 1/18 | 0 | 68.00 | 42.00 | 9.71 |
-| 4 | D J J Bravo | 9 | 7 | 1 | 1 | 0 | 0 | 19 | 5 | 64* | 178 | 134 | 132.84 | 29.67 | 4 | 0 | 8.56% | 9 | 9 | 28.2 | 1 | 232 | 11 | 3/24 | 0 | 21.09 | 15.45 | 8.19 |
-| 5 | S R Tendulkar | 7 | 7 | 1 | 1 | 0 | 1 | 26 | 2 | 65 | 188 | 177 | 106.21 | 31.33 | 6 | 0 | 9.04% |  |  |  |  |  |  |  |  |  |  |  |
-| 6 | S M Pollock | 13 | 8 | 0 | 0 | 0 | 2 | 12 | 8 | 33 | 147 | 111 | 132.43 | 18.38 | 2 | 0 | 7.07% | 13 | 13 | 46.0 | 1 | 301 | 11 | 3/12 | 0 | 27.36 | 25.09 | 6.54 |
-| 7 | Y V Takawale | 7 | 4 | 2 | 0 | 0 | 0 | 7 | 2 | 27 | 70 | 65 | 107.69 | 35.00 | 10 | 1 | 3.37% |  |  |  |  |  |  |  |  |  |  |  |
-| 8 | Harbhajan Singh | 3 | 3 | 1 | 0 | 0 | 1 | 1 | 3 | 28 | 30 | 17 | 176.47 | 15.00 | 2 | 0 | 1.44% | 3 | 3 | 10.0 | 0 | 82 | 5 | 3/32 | 0 | 16.40 | 12.00 | 8.20 |
-| 9 | C R D Fernando | 5 | 1 | 1 | 0 | 0 | 0 | 0 | 0 | 2* | 2 | 1 | 200.00 |  | 2 | 0 | 0.10% | 5 | 5 | 20.0 | 0 | 160 | 10 | 4/18 | 1 | 16.00 | 12.00 | 8.00 |
-| 10 | A Nehra | 14 | 4 | 3 | 0 | 0 | 1 | 0 | 0 | 2* | 3 | 13 | 23.08 | 3.00 | 7 | 0 | 0.14% | 14 | 14 | 44.5 | 0 | 348 | 12 | 3/13 | 0 | 29.00 | 22.42 | 7.76 |
-| 11 | D S Kulkarni | 10 | 1 | 1 | 0 | 0 | 0 | 0 | 0 | 2* | 2 | 16 | 12.50 |  | 2 | 0 | 0.10% | 10 | 10 | 29.3 | 0 | 236 | 11 | 3/33 | 0 | 21.45 | 16.09 | 8.00 |
-
-**Closest exclusions:** D Thornely, D R Smith, R R Raje
+| XI | Role | Player | Bat Mat | Bat Inns | Bat NO | Bat 50s | Bat 100s | Bat 0s | Bat 4s | Bat 6s | Bat HS | Bat Runs | Bat B/F | Bat S/R | Bat Avg | Bat Ca | Bat St | Bat % Team Runs | Bowl Mat | Bowl Inns | Bowl O | Bowl M | Bowl R | Bowl W | Bowl Best | Bowl 4w | Bowl Avg | Bowl S/R | Bowl E/R |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | Opener / Spin | S T Jayasuriya | 14 | 14 | 2 | 2 | 1 | 0 | 57 | 31 | 114* | 514 | 309 | 166.34 | 42.83 | 2 | 0 | 24.71% | 14 | 8 | 21.0 | 1 | 159 | 4 | 3/14 | 0 | 39.75 | 31.50 | 7.57 |
+| 2 | Opener | S R Tendulkar | 7 | 7 | 1 | 1 | 0 | 1 | 26 | 2 | 65 | 188 | 177 | 106.21 | 31.33 | 6 | 0 | 9.04% |  |  |  |  |  |  |  |  |  |  |  |
+| 3 | Top order | R V Uthappa | 14 | 14 | 5 | 0 | 0 | 0 | 34 | 9 | 48 | 320 | 279 | 114.70 | 35.56 | 9 | 0 | 15.38% |  |  |  |  |  |  |  |  |  |  |  |
+| 4 | Middle order / Pace all-rounder | D J J Bravo | 9 | 7 | 1 | 1 | 0 | 0 | 19 | 5 | 64* | 178 | 134 | 132.84 | 29.67 | 4 | 0 | 8.56% | 9 | 9 | 28.2 | 1 | 232 | 11 | 3/24 | 0 | 21.09 | 15.45 | 8.19 |
+| 5 | Finisher / Medium pace | A M Nayar | 14 | 10 | 2 | 0 | 0 | 0 | 16 | 9 | 45* | 206 | 138 | 149.28 | 25.75 | 4 | 0 | 9.90% | 14 | 5 | 7.0 | 0 | 68 | 1 | 1/18 | 0 | 68.00 | 42.00 | 9.71 |
+| 6 | Pace all-rounder | S M Pollock | 13 | 8 | 0 | 0 | 0 | 2 | 12 | 8 | 33 | 147 | 111 | 132.43 | 18.38 | 2 | 0 | 7.07% | 13 | 13 | 46.0 | 1 | 301 | 11 | 3/12 | 0 | 27.36 | 25.09 | 6.54 |
+| 7 | WK | Y V Takawale | 7 | 4 | 2 | 0 | 0 | 0 | 7 | 2 | 27 | 70 | 65 | 107.69 | 35.00 | 10 | 1 | 3.37% |  |  |  |  |  |  |  |  |  |  |  |
+| 8 | Spinner | Harbhajan Singh | 3 | 3 | 1 | 0 | 0 | 1 | 1 | 3 | 28 | 30 | 17 | 176.47 | 15.00 | 2 | 0 | 1.44% | 3 | 3 | 10.0 | 0 | 82 | 5 | 3/32 | 0 | 16.40 | 12.00 | 8.20 |
+| 9 | Pacer | C R D Fernando | 5 | 1 | 1 | 0 | 0 | 0 | 0 | 0 | 2* | 2 | 1 | 200.00 |  | 2 | 0 | 0.10% | 5 | 5 | 20.0 | 0 | 160 | 10 | 4/18 | 1 | 16.00 | 12.00 | 8.00 |
+| 10 | Pacer | A Nehra | 14 | 4 | 3 | 0 | 0 | 1 | 0 | 0 | 2* | 3 | 13 | 23.08 | 3.00 | 7 | 0 | 0.14% | 14 | 14 | 44.5 | 0 | 348 | 12 | 3/13 | 0 | 29.00 | 22.42 | 7.76 |
+| 11 | Pacer | D S Kulkarni | 10 | 1 | 1 | 0 | 0 | 0 | 0 | 0 | 2* | 2 | 16 | 12.50 |  | 2 | 0 | 0.10% | 10 | 10 | 29.3 | 0 | 236 | 11 | 3/33 | 0 | 21.45 | 16.09 | 8.00 |
 
 ### Punjab Kings
 
-**Playing XI:** 1. S E Marsh, 2. Yuvraj Singh, 3. K C Sangakkara, 4. L A Pommersbach, 5. J R Hopes, 6. D P M D Jayawardene, 7. I K Pathan, 8. P P Chawla, 9. B Lee, 10. V R Singh, 11. S Sreesanth
+**Playing XI by role:**
 
-**Balance:** 7 bowling options; wicketkeeper candidate(s): K C Sangakkara.
+1. **S E Marsh** — Opener
+2. **K C Sangakkara** — Opener / WK
+3. **D P M D Jayawardene** — Middle order
+4. **Yuvraj Singh** — Middle order / Part-time spin
+5. **L A Pommersbach** — Finisher
+6. **J R Hopes** — Pace all-rounder
+7. **I K Pathan** — Pace all-rounder
+8. **P P Chawla** — Spinner
+9. **B Lee** — Pacer
+10. **V R Singh** — Pacer
+11. **S Sreesanth** — Pacer
 
-| XI | Player | Bat Mat | Bat Inns | Bat NO | Bat 50s | Bat 100s | Bat 0s | Bat 4s | Bat 6s | Bat HS | Bat Runs | Bat B/F | Bat S/R | Bat Avg | Bat Ca | Bat St | Bat % Team Runs | Bowl Mat | Bowl Inns | Bowl O | Bowl M | Bowl R | Bowl W | Bowl Best | Bowl 4w | Bowl Avg | Bowl S/R | Bowl E/R |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | S E Marsh | 11 | 11 | 2 | 5 | 1 | 0 | 59 | 26 | 115 | 616 | 441 | 139.68 | 68.44 | 3 | 0 | 25.00% |  |  |  |  |  |  |  |  |  |  |  |
-| 2 | Yuvraj Singh | 15 | 14 | 1 | 1 | 0 | 0 | 24 | 19 | 57 | 299 | 184 | 162.50 | 23.00 | 7 | 0 | 12.13% | 15 | 6 | 9.0 | 0 | 83 | 3 | 2/12 | 0 | 27.67 | 18.00 | 9.22 |
-| 3 | K C Sangakkara | 10 | 9 | 0 | 4 | 0 | 0 | 41 | 8 | 94 | 320 | 198 | 161.62 | 35.56 | 4 | 0 | 12.99% |  |  |  |  |  |  |  |  |  |  |  |
-| 4 | L A Pommersbach | 5 | 5 | 4 | 1 | 0 | 0 | 13 | 9 | 79* | 152 | 99 | 153.54 | 152.00 | 1 | 0 | 6.17% |  |  |  |  |  |  |  |  |  |  |  |
-| 5 | J R Hopes | 11 | 11 | 0 | 2 | 0 | 1 | 27 | 8 | 71 | 221 | 148 | 149.32 | 20.09 | 3 | 0 | 8.97% | 11 | 11 | 28.0 | 0 | 276 | 7 | 2/2 | 0 | 39.43 | 24.00 | 9.86 |
-| 6 | D P M D Jayawardene | 13 | 12 | 5 | 0 | 0 | 0 | 15 | 7 | 45* | 179 | 131 | 136.64 | 25.57 | 3 | 0 | 7.26% |  |  |  |  |  |  |  |  |  |  |  |
-| 7 | I K Pathan | 14 | 10 | 4 | 0 | 0 | 0 | 8 | 5 | 40 | 131 | 116 | 112.93 | 21.83 | 4 | 0 | 5.32% | 14 | 14 | 53.0 | 2 | 350 | 15 | 2/18 | 0 | 23.33 | 21.20 | 6.60 |
-| 8 | P P Chawla | 15 | 7 | 3 | 0 | 0 | 2 | 10 | 3 | 24* | 90 | 59 | 152.54 | 22.50 | 6 | 0 | 3.65% | 15 | 15 | 46.5 | 0 | 389 | 17 | 3/25 | 0 | 22.88 | 16.53 | 8.31 |
-| 9 | B Lee | 4 | 3 | 2 | 0 | 0 | 1 | 2 | 1 | 16* | 17 | 13 | 130.77 | 17.00 | 3 | 0 | 0.69% | 4 | 4 | 16.0 | 0 | 112 | 4 | 1/9 | 0 | 28.00 | 24.00 | 7.00 |
-| 10 | V R Singh | 13 | 2 | 0 | 0 | 0 | 1 | 1 | 0 | 4 | 4 | 3 | 133.33 | 2.00 | 1 | 0 | 0.16% | 13 | 13 | 48.0 | 0 | 420 | 11 | 3/29 | 0 | 38.18 | 26.18 | 8.75 |
-| 11 | S Sreesanth | 15 | 3 | 2 | 0 | 0 | 1 | 0 | 0 | 0* | 0 | 3 | 0.00 | 0.00 | 2 | 0 |  | 15 | 15 | 51.1 | 0 | 442 | 19 | 3/29 | 0 | 23.26 | 16.16 | 8.64 |
-
-**Closest exclusions:** R R Powar, W A Mota, S M Katich
+| XI | Role | Player | Bat Mat | Bat Inns | Bat NO | Bat 50s | Bat 100s | Bat 0s | Bat 4s | Bat 6s | Bat HS | Bat Runs | Bat B/F | Bat S/R | Bat Avg | Bat Ca | Bat St | Bat % Team Runs | Bowl Mat | Bowl Inns | Bowl O | Bowl M | Bowl R | Bowl W | Bowl Best | Bowl 4w | Bowl Avg | Bowl S/R | Bowl E/R |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | Opener | S E Marsh | 11 | 11 | 2 | 5 | 1 | 0 | 59 | 26 | 115 | 616 | 441 | 139.68 | 68.44 | 3 | 0 | 25.00% |  |  |  |  |  |  |  |  |  |  |  |
+| 2 | Opener / WK | K C Sangakkara | 10 | 9 | 0 | 4 | 0 | 0 | 41 | 8 | 94 | 320 | 198 | 161.62 | 35.56 | 4 | 0 | 12.99% |  |  |  |  |  |  |  |  |  |  |  |
+| 3 | Middle order | D P M D Jayawardene | 13 | 12 | 5 | 0 | 0 | 0 | 15 | 7 | 45* | 179 | 131 | 136.64 | 25.57 | 3 | 0 | 7.26% |  |  |  |  |  |  |  |  |  |  |  |
+| 4 | Middle order / Part-time spin | Yuvraj Singh | 15 | 14 | 1 | 1 | 0 | 0 | 24 | 19 | 57 | 299 | 184 | 162.50 | 23.00 | 7 | 0 | 12.13% | 15 | 6 | 9.0 | 0 | 83 | 3 | 2/12 | 0 | 27.67 | 18.00 | 9.22 |
+| 5 | Finisher | L A Pommersbach | 5 | 5 | 4 | 1 | 0 | 0 | 13 | 9 | 79* | 152 | 99 | 153.54 | 152.00 | 1 | 0 | 6.17% |  |  |  |  |  |  |  |  |  |  |  |
+| 6 | Pace all-rounder | J R Hopes | 11 | 11 | 0 | 2 | 0 | 1 | 27 | 8 | 71 | 221 | 148 | 149.32 | 20.09 | 3 | 0 | 8.97% | 11 | 11 | 28.0 | 0 | 276 | 7 | 2/2 | 0 | 39.43 | 24.00 | 9.86 |
+| 7 | Pace all-rounder | I K Pathan | 14 | 10 | 4 | 0 | 0 | 0 | 8 | 5 | 40 | 131 | 116 | 112.93 | 21.83 | 4 | 0 | 5.32% | 14 | 14 | 53.0 | 2 | 350 | 15 | 2/18 | 0 | 23.33 | 21.20 | 6.60 |
+| 8 | Spinner | P P Chawla | 15 | 7 | 3 | 0 | 0 | 2 | 10 | 3 | 24* | 90 | 59 | 152.54 | 22.50 | 6 | 0 | 3.65% | 15 | 15 | 46.5 | 0 | 389 | 17 | 3/25 | 0 | 22.88 | 16.53 | 8.31 |
+| 9 | Pacer | B Lee | 4 | 3 | 2 | 0 | 0 | 1 | 2 | 1 | 16* | 17 | 13 | 130.77 | 17.00 | 3 | 0 | 0.69% | 4 | 4 | 16.0 | 0 | 112 | 4 | 1/9 | 0 | 28.00 | 24.00 | 7.00 |
+| 10 | Pacer | V R Singh | 13 | 2 | 0 | 0 | 0 | 1 | 1 | 0 | 4 | 4 | 3 | 133.33 | 2.00 | 1 | 0 | 0.16% | 13 | 13 | 48.0 | 0 | 420 | 11 | 3/29 | 0 | 38.18 | 26.18 | 8.75 |
+| 11 | Pacer | S Sreesanth | 15 | 3 | 2 | 0 | 0 | 1 | 0 | 0 | 0* | 0 | 3 | 0.00 | 0.00 | 2 | 0 |  | 15 | 15 | 51.1 | 0 | 442 | 19 | 3/29 | 0 | 23.26 | 16.16 | 8.64 |
 
 ### Rajasthan Royals
 
-**Playing XI:** 1. S R Watson, 2. Y K Pathan, 3. G C Smith, 4. S A Asnodkar, 5. M Kaif, 6. Kamran Akmal, 7. N K Patel, 8. S K Warne, 9. Sohail Tanvir, 10. S K Trivedi, 11. M M Patel
+**Playing XI by role:**
 
-**Balance:** 6 bowling options; wicketkeeper candidate(s): Kamran Akmal.
+1. **G C Smith** — Opener
+2. **S A Asnodkar** — Opener
+3. **S R Watson** — Top order / Pace all-rounder
+4. **Y K Pathan** — Finisher / Spin all-rounder
+5. **M Kaif** — Middle order
+6. **Kamran Akmal** — WK / Middle order
+7. **R A Jadeja** — Finisher / Spin
+8. **S K Warne** — Spinner
+9. **Sohail Tanvir** — Pacer
+10. **M M Patel** — Pacer
+11. **S K Trivedi** — Pacer
 
-| XI | Player | Bat Mat | Bat Inns | Bat NO | Bat 50s | Bat 100s | Bat 0s | Bat 4s | Bat 6s | Bat HS | Bat Runs | Bat B/F | Bat S/R | Bat Avg | Bat Ca | Bat St | Bat % Team Runs | Bowl Mat | Bowl Inns | Bowl O | Bowl M | Bowl R | Bowl W | Bowl Best | Bowl 4w | Bowl Avg | Bowl S/R | Bowl E/R |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | S R Watson | 15 | 15 | 5 | 4 | 0 | 1 | 45 | 19 | 76* | 472 | 311 | 151.77 | 47.20 | 2 | 0 | 18.15% | 15 | 15 | 54.1 | 0 | 383 | 17 | 3/10 | 0 | 22.53 | 19.12 | 7.07 |
-| 2 | Y K Pathan | 16 | 15 | 1 | 4 | 0 | 0 | 43 | 25 | 68 | 435 | 243 | 179.01 | 31.07 | 3 | 0 | 16.72% | 16 | 13 | 28.1 | 0 | 230 | 8 | 3/22 | 0 | 28.75 | 21.13 | 8.17 |
-| 3 | G C Smith | 11 | 11 | 2 | 3 | 0 | 0 | 54 | 8 | 91 | 441 | 362 | 121.82 | 49.00 | 2 | 0 | 16.96% |  |  |  |  |  |  |  |  |  |  |  |
-| 4 | S A Asnodkar | 9 | 9 | 0 | 2 | 0 | 0 | 43 | 6 | 60 | 311 | 233 | 133.48 | 34.56 | 5 | 0 | 11.96% |  |  |  |  |  |  |  |  |  |  |  |
-| 5 | M Kaif | 16 | 14 | 3 | 0 | 0 | 0 | 14 | 6 | 34* | 176 | 171 | 102.92 | 16.00 | 8 | 0 | 6.77% |  |  |  |  |  |  |  |  |  |  |  |
-| 6 | Kamran Akmal | 6 | 6 | 1 | 1 | 0 | 0 | 13 | 8 | 53* | 128 | 78 | 164.10 | 25.60 | 5 | 4 | 4.92% |  |  |  |  |  |  |  |  |  |  |  |
-| 7 | N K Patel | 5 | 4 | 2 | 1 | 0 | 0 | 13 | 1 | 57 | 103 | 81 | 127.16 | 51.50 | 2 | 0 | 3.96% |  |  |  |  |  |  |  |  |  |  |  |
-| 8 | S K Warne | 15 | 7 | 2 | 0 | 0 | 1 | 7 | 2 | 22* | 70 | 59 | 118.64 | 14.00 | 6 | 0 | 2.69% | 15 | 15 | 52.0 | 1 | 404 | 19 | 3/19 | 0 | 21.26 | 16.42 | 7.77 |
-| 9 | Sohail Tanvir | 11 | 5 | 2 | 0 | 0 | 0 | 3 | 1 | 13 | 36 | 29 | 124.14 | 12.00 | 4 | 0 | 1.38% | 11 | 11 | 41.1 | 0 | 266 | 22 | 6/14 | 2 | 12.09 | 11.23 | 6.46 |
-| 10 | S K Trivedi | 15 | 3 | 2 | 0 | 0 | 0 | 0 | 0 | 3* | 5 | 12 | 41.67 | 5.00 | 3 | 0 | 0.19% | 15 | 15 | 48.0 | 0 | 399 | 13 | 2/25 | 0 | 30.69 | 22.15 | 8.31 |
-| 11 | M M Patel | 15 | 2 | 2 | 0 | 0 | 0 | 0 | 0 | 0* | 0 | 1 | 0.00 |  | 2 | 0 |  | 15 | 15 | 55.0 | 1 | 420 | 14 | 3/17 | 0 | 30.00 | 23.57 | 7.64 |
-
-**Closest exclusions:** A D Mascarenhas, R A Jadeja, D Salunkhe
+| XI | Role | Player | Bat Mat | Bat Inns | Bat NO | Bat 50s | Bat 100s | Bat 0s | Bat 4s | Bat 6s | Bat HS | Bat Runs | Bat B/F | Bat S/R | Bat Avg | Bat Ca | Bat St | Bat % Team Runs | Bowl Mat | Bowl Inns | Bowl O | Bowl M | Bowl R | Bowl W | Bowl Best | Bowl 4w | Bowl Avg | Bowl S/R | Bowl E/R |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | Opener | G C Smith | 11 | 11 | 2 | 3 | 0 | 0 | 54 | 8 | 91 | 441 | 362 | 121.82 | 49.00 | 2 | 0 | 16.96% |  |  |  |  |  |  |  |  |  |  |  |
+| 2 | Opener | S A Asnodkar | 9 | 9 | 0 | 2 | 0 | 0 | 43 | 6 | 60 | 311 | 233 | 133.48 | 34.56 | 5 | 0 | 11.96% |  |  |  |  |  |  |  |  |  |  |  |
+| 3 | Top order / Pace all-rounder | S R Watson | 15 | 15 | 5 | 4 | 0 | 1 | 45 | 19 | 76* | 472 | 311 | 151.77 | 47.20 | 2 | 0 | 18.15% | 15 | 15 | 54.1 | 0 | 383 | 17 | 3/10 | 0 | 22.53 | 19.12 | 7.07 |
+| 4 | Finisher / Spin all-rounder | Y K Pathan | 16 | 15 | 1 | 4 | 0 | 0 | 43 | 25 | 68 | 435 | 243 | 179.01 | 31.07 | 3 | 0 | 16.72% | 16 | 13 | 28.1 | 0 | 230 | 8 | 3/22 | 0 | 28.75 | 21.13 | 8.17 |
+| 5 | Middle order | M Kaif | 16 | 14 | 3 | 0 | 0 | 0 | 14 | 6 | 34* | 176 | 171 | 102.92 | 16.00 | 8 | 0 | 6.77% |  |  |  |  |  |  |  |  |  |  |  |
+| 6 | WK / Middle order | Kamran Akmal | 6 | 6 | 1 | 1 | 0 | 0 | 13 | 8 | 53* | 128 | 78 | 164.10 | 25.60 | 5 | 4 | 4.92% |  |  |  |  |  |  |  |  |  |  |  |
+| 7 | Finisher / Spin | R A Jadeja | 14 | 9 | 2 | 0 | 0 | 2 | 11 | 6 | 36* | 135 | 103 | 131.07 | 19.29 | 7 | 0 | 5.19% | 14 | 2 | 2.1 | 0 | 21 | 0 | 0/0 | 0 |  |  | 9.69 |
+| 8 | Spinner | S K Warne | 15 | 7 | 2 | 0 | 0 | 1 | 7 | 2 | 22* | 70 | 59 | 118.64 | 14.00 | 6 | 0 | 2.69% | 15 | 15 | 52.0 | 1 | 404 | 19 | 3/19 | 0 | 21.26 | 16.42 | 7.77 |
+| 9 | Pacer | Sohail Tanvir | 11 | 5 | 2 | 0 | 0 | 0 | 3 | 1 | 13 | 36 | 29 | 124.14 | 12.00 | 4 | 0 | 1.38% | 11 | 11 | 41.1 | 0 | 266 | 22 | 6/14 | 2 | 12.09 | 11.23 | 6.46 |
+| 10 | Pacer | M M Patel | 15 | 2 | 2 | 0 | 0 | 0 | 0 | 0 | 0* | 0 | 1 | 0.00 |  | 2 | 0 |  | 15 | 15 | 55.0 | 1 | 420 | 14 | 3/17 | 0 | 30.00 | 23.57 | 7.64 |
+| 11 | Pacer | S K Trivedi | 15 | 3 | 2 | 0 | 0 | 0 | 0 | 0 | 3* | 5 | 12 | 41.67 | 5.00 | 3 | 0 | 0.19% | 15 | 15 | 48.0 | 0 | 399 | 13 | 2/25 | 0 | 30.69 | 22.15 | 8.31 |
 
 ### Royal Challengers Bengaluru
 
-**Playing XI:** 1. R Dravid, 2. M V Boucher, 3. L R P L Taylor, 4. J H Kallis, 5. V Kohli, 6. Misbah-ul-Haq, 7. P Kumar, 8. Z Khan, 9. R Vinay Kumar, 10. A Kumble, 11. D W Steyn
+**Playing XI by role:**
 
-**Balance:** 7 bowling options; wicketkeeper candidate(s): M V Boucher.
+1. **R Dravid** — Opener / Top order
+2. **W Jaffer** — Opener
+3. **J H Kallis** — Top order / Pace all-rounder
+4. **M V Boucher** — WK / Middle order
+5. **L R P L Taylor** — Finisher
+6. **Misbah-ul-Haq** — Finisher
+7. **P Kumar** — Pace all-rounder
+8. **Z Khan** — Pacer
+9. **D W Steyn** — Pacer
+10. **A Kumble** — Spinner
+11. **R Vinay Kumar** — Pacer
 
-| XI | Player | Bat Mat | Bat Inns | Bat NO | Bat 50s | Bat 100s | Bat 0s | Bat 4s | Bat 6s | Bat HS | Bat Runs | Bat B/F | Bat S/R | Bat Avg | Bat Ca | Bat St | Bat % Team Runs | Bowl Mat | Bowl Inns | Bowl O | Bowl M | Bowl R | Bowl W | Bowl Best | Bowl 4w | Bowl Avg | Bowl S/R | Bowl E/R |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | R Dravid | 14 | 14 | 1 | 2 | 0 | 2 | 35 | 11 | 75* | 371 | 298 | 124.50 | 28.54 | 2 | 0 | 18.71% |  |  |  |  |  |  |  |  |  |  |  |
-| 2 | M V Boucher | 10 | 10 | 3 | 1 | 0 | 0 | 24 | 6 | 50* | 225 | 177 | 127.12 | 32.14 | 3 | 1 | 11.35% |  |  |  |  |  |  |  |  |  |  |  |
-| 3 | L R P L Taylor | 4 | 4 | 0 | 1 | 0 | 0 | 13 | 10 | 53 | 149 | 81 | 183.95 | 37.25 | 0 | 0 | 7.51% |  |  |  |  |  |  |  |  |  |  |  |
-| 4 | J H Kallis | 11 | 11 | 0 | 1 | 0 | 1 | 23 | 4 | 54 | 199 | 183 | 108.74 | 18.09 | 3 | 0 | 10.04% | 11 | 11 | 34.2 | 0 | 311 | 4 | 2/39 | 0 | 77.75 | 51.50 | 9.06 |
-| 5 | V Kohli | 13 | 12 | 1 | 0 | 0 | 1 | 18 | 4 | 38 | 165 | 157 | 105.10 | 15.00 | 2 | 0 | 8.32% | 13 | 4 | 7.4 | 0 | 61 | 2 | 2/25 | 0 | 30.50 | 23.00 | 7.96 |
-| 6 | Misbah-ul-Haq | 8 | 8 | 1 | 0 | 0 | 2 | 10 | 6 | 47* | 117 | 81 | 144.44 | 16.71 | 1 | 0 | 5.90% |  |  |  |  |  |  |  |  |  |  |  |
-| 7 | P Kumar | 13 | 12 | 2 | 0 | 0 | 2 | 10 | 6 | 34 | 112 | 98 | 114.29 | 11.20 | 3 | 0 | 5.65% | 13 | 13 | 44.4 | 1 | 366 | 11 | 3/23 | 0 | 33.27 | 24.36 | 8.19 |
-| 8 | Z Khan | 11 | 8 | 4 | 0 | 0 | 1 | 4 | 0 | 17* | 34 | 43 | 79.07 | 8.50 | 1 | 0 | 1.71% | 11 | 11 | 42.0 | 0 | 357 | 13 | 3/38 | 0 | 27.46 | 19.38 | 8.50 |
-| 9 | R Vinay Kumar | 8 | 4 | 1 | 0 | 0 | 1 | 2 | 1 | 23 | 25 | 22 | 113.64 | 8.33 | 2 | 0 | 1.26% | 8 | 8 | 23.0 | 0 | 182 | 5 | 3/27 | 0 | 36.40 | 27.60 | 7.91 |
-| 10 | A Kumble | 10 | 5 | 3 | 0 | 0 | 0 | 1 | 0 | 8 | 13 | 17 | 76.47 | 6.50 | 4 | 0 | 0.66% | 10 | 10 | 38.2 | 0 | 304 | 7 | 3/14 | 0 | 43.43 | 32.86 | 7.93 |
-| 11 | D W Steyn | 10 | 2 | 1 | 0 | 0 | 0 | 0 | 0 | 1* | 2 | 5 | 40.00 | 2.00 | 4 | 0 | 0.10% | 10 | 10 | 38.0 | 0 | 252 | 10 | 3/27 | 0 | 25.20 | 22.80 | 6.63 |
-
-**Closest exclusions:** B Akhil, A A Noffke, C L White
+| XI | Role | Player | Bat Mat | Bat Inns | Bat NO | Bat 50s | Bat 100s | Bat 0s | Bat 4s | Bat 6s | Bat HS | Bat Runs | Bat B/F | Bat S/R | Bat Avg | Bat Ca | Bat St | Bat % Team Runs | Bowl Mat | Bowl Inns | Bowl O | Bowl M | Bowl R | Bowl W | Bowl Best | Bowl 4w | Bowl Avg | Bowl S/R | Bowl E/R |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | Opener / Top order | R Dravid | 14 | 14 | 1 | 2 | 0 | 2 | 35 | 11 | 75* | 371 | 298 | 124.50 | 28.54 | 2 | 0 | 18.71% |  |  |  |  |  |  |  |  |  |  |  |
+| 2 | Opener | W Jaffer | 6 | 6 | 0 | 1 | 0 | 1 | 12 | 3 | 50 | 115 | 104 | 110.58 | 19.17 | 3 | 0 | 5.80% |  |  |  |  |  |  |  |  |  |  |  |
+| 3 | Top order / Pace all-rounder | J H Kallis | 11 | 11 | 0 | 1 | 0 | 1 | 23 | 4 | 54 | 199 | 183 | 108.74 | 18.09 | 3 | 0 | 10.04% | 11 | 11 | 34.2 | 0 | 311 | 4 | 2/39 | 0 | 77.75 | 51.50 | 9.06 |
+| 4 | WK / Middle order | M V Boucher | 10 | 10 | 3 | 1 | 0 | 0 | 24 | 6 | 50* | 225 | 177 | 127.12 | 32.14 | 3 | 1 | 11.35% |  |  |  |  |  |  |  |  |  |  |  |
+| 5 | Finisher | L R P L Taylor | 4 | 4 | 0 | 1 | 0 | 0 | 13 | 10 | 53 | 149 | 81 | 183.95 | 37.25 | 0 | 0 | 7.51% |  |  |  |  |  |  |  |  |  |  |  |
+| 6 | Finisher | Misbah-ul-Haq | 8 | 8 | 1 | 0 | 0 | 2 | 10 | 6 | 47* | 117 | 81 | 144.44 | 16.71 | 1 | 0 | 5.90% |  |  |  |  |  |  |  |  |  |  |  |
+| 7 | Pace all-rounder | P Kumar | 13 | 12 | 2 | 0 | 0 | 2 | 10 | 6 | 34 | 112 | 98 | 114.29 | 11.20 | 3 | 0 | 5.65% | 13 | 13 | 44.4 | 1 | 366 | 11 | 3/23 | 0 | 33.27 | 24.36 | 8.19 |
+| 8 | Pacer | Z Khan | 11 | 8 | 4 | 0 | 0 | 1 | 4 | 0 | 17* | 34 | 43 | 79.07 | 8.50 | 1 | 0 | 1.71% | 11 | 11 | 42.0 | 0 | 357 | 13 | 3/38 | 0 | 27.46 | 19.38 | 8.50 |
+| 9 | Pacer | D W Steyn | 10 | 2 | 1 | 0 | 0 | 0 | 0 | 0 | 1* | 2 | 5 | 40.00 | 2.00 | 4 | 0 | 0.10% | 10 | 10 | 38.0 | 0 | 252 | 10 | 3/27 | 0 | 25.20 | 22.80 | 6.63 |
+| 10 | Spinner | A Kumble | 10 | 5 | 3 | 0 | 0 | 0 | 1 | 0 | 8 | 13 | 17 | 76.47 | 6.50 | 4 | 0 | 0.66% | 10 | 10 | 38.2 | 0 | 304 | 7 | 3/14 | 0 | 43.43 | 32.86 | 7.93 |
+| 11 | Pacer | R Vinay Kumar | 8 | 4 | 1 | 0 | 0 | 1 | 2 | 1 | 23 | 25 | 22 | 113.64 | 8.33 | 2 | 0 | 1.26% | 8 | 8 | 23.0 | 0 | 182 | 5 | 3/27 | 0 | 36.40 | 27.60 | 7.91 |
