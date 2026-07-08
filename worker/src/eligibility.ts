@@ -1,0 +1,103 @@
+import type { Player } from './types';
+
+/**
+ * First-pass thresholds carried over from the earlier fixed-XI calibration
+ * (top-7 batting/finishing averages, bottom-4 bowling depth, keeper, bowler
+ * count). The draft mechanic — pick the single best-fitting player per slot
+ * out of up to 15 team-seasons — gives far more optimization power than a
+ * fixed historical XI ever had, so these will very likely need re-tuning
+ * once we can playtest real drafted lineups. Treat as tunable constants.
+ */
+export const THRESHOLDS = {
+  TOP_BATTING_AVG: 60,
+  TOP_FINISHING_AVG: 62,
+  BOTTOM_BOWLING_AVG: 48,
+  REAL_BOWLER_MIN_SCORE: 40,
+  MIN_REAL_BOWLERS: 3,
+};
+
+export interface EligibilityResult {
+  eligible: boolean;
+  hasKeeper: boolean;
+  realBowlerCount: number;
+  topBattingAvg: number;
+  topFinishingAvg: number;
+  bottomBowlingAvg: number;
+  /** hard-fail: no keeper, or fewer than MIN_REAL_BOWLERS real bowlers */
+  structural: boolean;
+  /** 0 = clears every threshold; higher = further below the bar */
+  shortfallIndex: number;
+}
+
+function avg(nums: number[]): number {
+  if (!nums.length) return 0;
+  return nums.reduce((a, b) => a + b, 0) / nums.length;
+}
+
+/** battingOrder must be exactly 11 players, already in slot order 1..11. */
+export function evaluateEligibility(battingOrder: Player[]): EligibilityResult {
+  const hasKeeper = battingOrder.some((p) => p.isKeeper);
+  const realBowlerCount = battingOrder.filter(
+    (p) => (p.bowlingScore ?? 0) >= THRESHOLDS.REAL_BOWLER_MIN_SCORE,
+  ).length;
+
+  const top7 = battingOrder.slice(0, 7);
+  const bottom4 = battingOrder.slice(7, 11);
+
+  const topBattingAvg = avg(top7.map((p) => p.battingScore ?? 0));
+  const topFinishingAvg = avg(top7.map((p) => p.finishingScore ?? 0));
+  const bottomBowlingAvg = avg(bottom4.map((p) => p.bowlingScore ?? 0));
+
+  const structural = !hasKeeper || realBowlerCount < THRESHOLDS.MIN_REAL_BOWLERS;
+
+  const battingShortfall = Math.max(0, (THRESHOLDS.TOP_BATTING_AVG - topBattingAvg) / THRESHOLDS.TOP_BATTING_AVG);
+  const finishingShortfall = Math.max(0, (THRESHOLDS.TOP_FINISHING_AVG - topFinishingAvg) / THRESHOLDS.TOP_FINISHING_AVG);
+  const bowlingShortfall = Math.max(0, (THRESHOLDS.BOTTOM_BOWLING_AVG - bottomBowlingAvg) / THRESHOLDS.BOTTOM_BOWLING_AVG);
+  const shortfallIndex = (battingShortfall + finishingShortfall + bowlingShortfall) / 3;
+
+  const eligible = !structural && battingShortfall === 0 && finishingShortfall === 0 && bowlingShortfall === 0;
+
+  return {
+    eligible,
+    hasKeeper,
+    realBowlerCount,
+    topBattingAvg,
+    topFinishingAvg,
+    bottomBowlingAvg,
+    structural,
+    shortfallIndex,
+  };
+}
+
+export type ReasonCode =
+  | 'win'
+  | 'blowup'
+  | 'choke'
+  | 'whisker'
+  | 'short_batting'
+  | 'attack_heartbreak'
+  | 'structurally_broken';
+
+export interface BandResult {
+  reason: ReasonCode;
+  targetMin: number;
+  targetMax: number;
+}
+
+/** WIN_LOTTERY_RATE: fraction of eligible sessions that actually win. */
+export const WIN_LOTTERY_RATE = 0.7;
+
+export function pickBand(elig: EligibilityResult, won: boolean): BandResult {
+  if (elig.eligible) {
+    if (won) return { reason: 'win', targetMin: 301, targetMax: 999 };
+    const reason: ReasonCode = Math.random() < 0.5 ? 'blowup' : 'choke';
+    return { reason, targetMin: 275, targetMax: 299 };
+  }
+  if (elig.structural) {
+    return { reason: 'structurally_broken', targetMin: 60, targetMax: 129 };
+  }
+  const s = elig.shortfallIndex;
+  if (s <= 0.05) return { reason: 'whisker', targetMin: 250, targetMax: 274 };
+  if (s <= 0.2) return { reason: 'short_batting', targetMin: 190, targetMax: 249 };
+  return { reason: 'attack_heartbreak', targetMin: 130, targetMax: 189 };
+}
