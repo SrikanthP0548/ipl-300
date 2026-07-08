@@ -1,0 +1,14 @@
+name = "ipl-300-worker"
+main = "src/index.ts"
+compatibility_date = "2025-01-01"
+
+# Set the real allowed origin once the GitHub Pages URL is known, e.g.
+# "https://srikanthp0548.github.io"
+[vars]
+ALLOWED_ORIGIN = "*"
+
+# POOL_SECRET (HMAC signing key for squad-pool / result tokens) is NOT set here.
+# For local dev, put it in a .dev.vars file (gitignored):
+#   POOL_SECRET=some-long-random-dev-only-string
+# For production, set it with:
+#   npx wrangler secret put POOL_SECRET
