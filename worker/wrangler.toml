@@ -7,6 +7,13 @@ compatibility_date = "2025-01-01"
 [vars]
 ALLOWED_ORIGIN = "*"
 
+[observability.logs]
+enabled = true
+invocation_logs = true
+
+[observability.traces]
+enabled = false
+
 # POOL_SECRET (HMAC signing key for squad-pool / result tokens) is NOT set here.
 # For local dev, put it in a .dev.vars file (gitignored):
 #   POOL_SECRET=some-long-random-dev-only-string
