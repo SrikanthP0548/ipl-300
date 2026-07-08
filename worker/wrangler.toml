@@ -1,4 +1,4 @@
-name = "ipl-300-worker"
+name = "ipl-300"
 main = "src/index.ts"
 compatibility_date = "2025-01-01"
 
