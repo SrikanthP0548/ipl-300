@@ -1,0 +1,248 @@
+:root {
+  --bg-base: #05070d;
+  --bg-panel-1: #17203f;
+  --bg-panel-2: #0d1326;
+  --bg-panel-3: #0a0f1e;
+  --bg-panel-4: #10162b;
+  --surface: rgba(255, 255, 255, 0.04);
+  --surface-strong: rgba(255, 255, 255, 0.06);
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.14);
+
+  --text-primary: #f4f6fb;
+  --text-secondary: #b7bfd6;
+  --text-muted: #8e97b0;
+  --text-faint: #6c7590;
+  --text-dim: #5c6480;
+  --text-disabled: #4b5270;
+
+  --gold: #f2b441;
+  --gold-hi: #ffcb63;
+  --gold-glow: rgba(242, 180, 65, 0.5);
+  --teal: #22d3c6;
+  --teal-hi: #2ee6d6;
+  --red: #f08477;
+  --red-strong: #e2483a;
+  --violet: #b6a6f5;
+
+  --role-batter-fg: #22d3c6;
+  --role-batter-bg: rgba(34, 211, 198, 0.12);
+  --role-batter-border: rgba(34, 211, 198, 0.4);
+  --role-allrounder-fg: #f2b441;
+  --role-allrounder-bg: rgba(242, 180, 65, 0.12);
+  --role-allrounder-border: rgba(242, 180, 65, 0.4);
+  --role-bowler-fg: #f08477;
+  --role-bowler-bg: rgba(226, 72, 58, 0.12);
+  --role-bowler-border: rgba(226, 72, 58, 0.4);
+  --role-keeper-fg: #b6a6f5;
+  --role-keeper-bg: rgba(155, 140, 242, 0.14);
+  --role-keeper-border: rgba(155, 140, 242, 0.4);
+
+  --font-display: 'Barlow Condensed', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-score: 'Graduate', serif;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 14px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+button {
+  font-family: inherit;
+}
+
+a {
+  color: inherit;
+}
+
+.app-shell {
+  position: relative;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background:
+    radial-gradient(120% 70% at 15% 0%, var(--bg-panel-1) 0%, var(--bg-panel-2) 42%, var(--bg-panel-3) 70%),
+    linear-gradient(180deg, var(--bg-panel-3) 0%, var(--bg-panel-2) 45%, var(--bg-panel-4) 100%);
+}
+
+.floodlights {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.floodlights::before,
+.floodlights::after {
+  content: '';
+  position: absolute;
+  width: 60vw;
+  max-width: 620px;
+  height: 60vw;
+  max-height: 620px;
+  border-radius: 50%;
+  animation: beamDrift 7s ease-in-out infinite;
+}
+
+.floodlights::before {
+  top: -20vw;
+  left: -20vw;
+  background: conic-gradient(from 20deg at 50% 50%, rgba(242, 180, 65, 0.18), rgba(242, 180, 65, 0) 35%);
+}
+
+.floodlights::after {
+  top: -22vw;
+  right: -22vw;
+  background: conic-gradient(from 200deg at 50% 50%, rgba(34, 211, 198, 0.15), rgba(34, 211, 198, 0) 32%);
+  animation-delay: 1s;
+}
+
+.dot-texture {
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 14px 14px;
+  opacity: 0.45;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes beamDrift {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes shimmerSweep {
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(220%);
+  }
+}
+
+@keyframes ctaPulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 0 rgba(242, 180, 65, 0.45),
+      0 14px 30px -8px rgba(242, 180, 65, 0.55);
+  }
+  50% {
+    box-shadow:
+      0 0 0 8px rgba(242, 180, 65, 0),
+      0 14px 34px -6px rgba(242, 180, 65, 0.7);
+  }
+}
+
+@keyframes slotPop {
+  0% {
+    transform: scale(0.85);
+  }
+  60% {
+    transform: scale(1.06);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes cardIn {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ballIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes wicketShake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-3px);
+  }
+  75% {
+    transform: translateX(3px);
+  }
+}
+
+@keyframes milestoneFlash {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(242, 180, 65, 0);
+  }
+  30% {
+    box-shadow: 0 0 0 6px rgba(242, 180, 65, 0.35);
+  }
+}
+
+@keyframes confettiFall {
+  0% {
+    transform: translateY(-30px) rotate(0deg);
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(110vh) rotate(340deg);
+    opacity: 0;
+  }
+}
+
+.page {
+  position: relative;
+  z-index: 1;
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 40px 20px 24px;
+}
+
+@media (min-width: 900px) {
+  .page {
+    max-width: 1100px;
+    padding: 40px 48px;
+  }
+}
