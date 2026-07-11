@@ -215,6 +215,26 @@ a {
   }
 }
 
+@keyframes reelFlicker {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+@keyframes reelPulse {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
 @keyframes confettiFall {
   0% {
     transform: translateY(-30px) rotate(0deg);

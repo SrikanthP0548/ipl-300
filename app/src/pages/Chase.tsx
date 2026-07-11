@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGame } from '../GameContext';
+import { Confetti } from '../components/Confetti';
 import type { BallEvent, OutcomeKey } from '../types';
 
 const TARGET = 301;
@@ -98,6 +99,7 @@ export function Chase() {
 
   return (
     <div className="page chase-page">
+      {isFinished && won && <Confetti />}
       <div className="chase-header">
         <div className="section-label">Chasing 301 · 20 Overs</div>
         <div className="chase-title">The Chase</div>

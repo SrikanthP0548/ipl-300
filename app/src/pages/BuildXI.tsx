@@ -1,10 +1,52 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGame } from '../GameContext';
 import { RoleBadge } from '../components/RoleBadge';
 import { ScoreReadout } from '../components/ScoreReadout';
 import { isLineupComplete, validSlotsForPlayer } from '../draft';
-import type { Player } from '../types';
+import type { Player, TeamSeason } from '../types';
+
+// Accelerating-then-settling delay sequence for the "rolling the dice"
+// team-reveal effect — mirrors a slot machine winding down.
+const SPIN_DELAYS = [40, 45, 55, 65, 80, 95, 115, 140, 170, 205, 250, 310, 380];
+
+/** Purely cosmetic: flickers through team names before landing on the real
+ * next team-season, so a new reveal always feels like a spin rather than
+ * an instant swap. Doesn't affect which team is actually shown next —
+ * that's already decided by draft.teamPointer. */
+function useTeamSpin(pool: TeamSeason[] | undefined, targetIndex: number | null) {
+  const [spinning, setSpinning] = useState(true);
+  const [spinIdx, setSpinIdx] = useState(targetIndex ?? 0);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (!pool || pool.length === 0 || targetIndex == null) return;
+
+    let step = 0;
+    let idx = spinIdx;
+    setSpinning(true);
+
+    const tick = () => {
+      if (step < SPIN_DELAYS.length) {
+        idx = (idx + 1) % pool.length;
+        setSpinIdx(idx);
+        timeoutRef.current = setTimeout(tick, SPIN_DELAYS[step]);
+        step++;
+      } else {
+        setSpinIdx(targetIndex);
+        timeoutRef.current = setTimeout(() => setSpinning(false), 320);
+      }
+    };
+    timeoutRef.current = setTimeout(tick, SPIN_DELAYS[0]);
+
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pool, targetIndex]);
+
+  return { spinning, spinTeam: pool && pool.length > 0 ? pool[spinIdx % pool.length] : null };
+}
 
 export function BuildXI() {
   const navigate = useNavigate();
@@ -41,6 +83,9 @@ export function BuildXI() {
     if (result) navigate('/chase');
   }, [result, navigate]);
 
+  const complete = draft ? isLineupComplete(draft.arrangement) : false;
+  const { spinning, spinTeam } = useTeamSpin(draft?.pool, complete ? null : (draft?.teamPointer ?? null));
+
   if (!draft) {
     return (
       <div className="page">
@@ -49,7 +94,6 @@ export function BuildXI() {
     );
   }
 
-  const complete = isLineupComplete(draft.arrangement);
   const filledCount = Object.keys(draft.arrangement).length;
 
   const slots = Array.from({ length: 11 }, (_, i) => {
@@ -98,7 +142,19 @@ export function BuildXI() {
 
       {error && <div className="home-error">{error}</div>}
 
-      {!complete && currentTeam && (
+      {!complete && spinning && (
+        <div className="spin-block">
+          <div className="spin-label">Finding next team…</div>
+          <div className="spin-team-name">{spinTeam ? `${spinTeam.franchise} · ${spinTeam.season}` : ''}</div>
+          <div className="spin-dots">
+            <span className="spin-dot gold" />
+            <span className="spin-dot teal" />
+            <span className="spin-dot red" />
+          </div>
+        </div>
+      )}
+
+      {!complete && !spinning && currentTeam && (
         <>
           <div className="team-banner">
             <div className="team-banner-name">

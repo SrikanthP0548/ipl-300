@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGame } from '../GameContext';
+import { Confetti } from '../components/Confetti';
 import { headlineFor, pickAnalysis } from '../copy';
 import { drawShareCard } from '../shareCard';
 
@@ -77,6 +78,7 @@ export function Result() {
 
   return (
     <div className="page result-page">
+      {won && <Confetti />}
       <div className="section-label">Result</div>
       <div className={won ? 'result-headline won' : 'result-headline'}>{headline}</div>
 
