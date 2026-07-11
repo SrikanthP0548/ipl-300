@@ -1,8 +1,10 @@
 """
-One-off Release 1A sample: apply the agreed new pipeline (leave-one-out
+Release 1A sample/diagnostic: apply the agreed new pipeline (leave-one-out
 baselines, balls-based confidence shrinkage on rates, no percentile
-normalization, no role-floor shrinkage) to 2008 ONLY, and print it next to
-the current production scores for comparison.
+normalization, no role-floor shrinkage) to a SINGLE season at a time, and
+print/export it next to the current production scores for comparison.
+
+Usage: python3 sample_release1a.py [season]   (defaults to 2008)
 
 Does not touch build_csv.py, build_game_json.py, or any production output.
 Interpretive calls I made that weren't pinned down in the design discussion
@@ -49,13 +51,23 @@ PRIOR_BALLS_BOWLING = 72.0
 MIN_TEAM_BALLS_FOR_LOO = 20  # fallback to season baseline below this
 
 
-def load_2008():
-    text = (REPO / FILES[2008]).read_text()
-    raw = extract_players(text, 2008)
+def load_season(season):
+    text = (REPO / FILES[season]).read_text()
+    raw = extract_players(text, season)
     for rec in raw:
         m, bm = build_player_metrics(rec)
         rec['_bat'] = m
         rec['_bowl'] = bm
+        # Some season files carry Econ but not a raw runs-conceded column at
+        # all (verified: 2018 and 2026 are 100% missing it, 2008 is fine).
+        # Production code never needs runsconceded directly (EconomyPowerRaw
+        # consumes econ straight), but this script aggregates it into
+        # season/team totals — reconstruct it exactly (Econ is defined as
+        # runs/(balls/6), so this isn't an approximation) rather than let
+        # missing data silently zero out a bowler's contribution to the
+        # baseline.
+        if bm['runsconceded'] is None and bm['econ'] is not None and bm['overs_balls'] > 0:
+            bm['runsconceded'] = round(bm['econ'] * bm['overs_balls'] / 6)
     return raw
 
 
@@ -208,8 +220,8 @@ def rescale(values, lo=25, hi=99):
     return f
 
 
-def main():
-    players = load_2008()
+def main(season_year):
+    players = load_season(season_year)
     season = season_totals(players)
     season_sr = (season['runs'] / season['bf']) * 100
     season_econ = season['rc'] / (season['bb'] / 6)
@@ -220,7 +232,7 @@ def main():
 
     team_tot = {t: team_totals(players, t) for t in TEAMS if any(p['team'] == t for p in players)}
 
-    old_players = {(p['name'], p['team']): p for p in compute_all_players() if p['season'] == 2008}
+    old_players = {(p['name'], p['team']): p for p in compute_all_players() if p['season'] == season_year}
 
     rows = []
     for p in players:
@@ -272,9 +284,11 @@ def fmt(v):
 
 if __name__ == '__main__':
     import csv
+    import sys
 
-    rows = main()
-    out_path = "/tmp/claude-0/-home-user-ipl-300/f3ec677b-388b-598c-a8d1-2914b979aaca/scratchpad/2008_release1a_comparison.csv"
+    season_arg = int(sys.argv[1]) if len(sys.argv) > 1 else 2008
+    rows = main(season_arg)
+    out_path = f"/tmp/claude-0/-home-user-ipl-300/f3ec677b-388b-598c-a8d1-2914b979aaca/scratchpad/{season_arg}_release1a_comparison.csv"
     with open(out_path, 'w', newline='') as f:
         w = csv.writer(f)
         w.writerow(['Name', 'Team', 'Role', 'BallsFaced', 'BallsBowled', 'Wickets',
