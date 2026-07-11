@@ -3,9 +3,8 @@ main = "src/index.ts"
 compatibility_date = "2025-01-01"
 
 # Set the real allowed origin once the GitHub Pages URL is known, e.g.
-# "https://srikanthp0548.github.io"
 [vars]
-ALLOWED_ORIGIN = "*"
+ALLOWED_ORIGIN = "https://ipl-300.com,https://www.ipl-300.com,http://localhost:5173"
 
 [observability.logs]
 enabled = true
