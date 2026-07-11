@@ -34,10 +34,21 @@ Reverse-engineered recipe (confirmed against the reference file, not guessed):
                          (pace and spin ranked in separate pools; economy inverted -
                           lower economy = higher percentile)
 
-This replaces the Bayesian per-player shrinkage approach from sample_release1a.py
-- that technique solves a real problem (small samples) but isn't what the
-reference file actually does. Small samples are handled here purely by the
-qualification cutoff in step 1.
+Below-cutoff players are NOT dropped here (unlike the reference file - see the
+FALLBACK section below): our own source data is already a curated ~11-player
+"Best XI" per team-season rather than a full squad, so dropping the same
+players the reference file drops would sometimes leave a team-season with as
+few as 8 draftable players. Instead, sub-threshold players get a FALLBACK
+score: the same confidence-weighted shrinkage built and validated earlier in
+sample_release1a.py (PRIOR_BALLS_BATTING=120, PRIOR_BALLS_BOWLING=72), blended
+toward the reference season's own league average (which is already on the
+correct era-adjusted scale, so no separate era-normalization step is needed
+for the blend target), then ranked in the exact same percentile pool as
+everyone else. Confidence shrinks to ~0 for very small samples, which pulls
+those players toward a middling/conservative score rather than an extreme one
+- this is what resolves the "should Zampa/McCullum be conservative" question
+from earlier: yes, but via shrinkage of the input, not a manual override of
+the output.
 
 Diagnostic only - does not touch build_csv.py, build_game_json.py, or any
 production output.
@@ -52,7 +63,7 @@ import sys
 from collections import defaultdict
 
 from build_csv import FILES, TEAMS, compute_all_players, to_int
-from sample_release1a import load_season
+from sample_release1a import PRIOR_BALLS_BATTING, PRIOR_BALLS_BOWLING, load_season
 
 REFERENCE_SEASON = 2026
 # Exact cutoffs confirmed against the reference file: minimum matches for a
@@ -161,36 +172,56 @@ def build():
         p['_adj_wpm'] = p['_adj_econ'] = None
         p['_qual_bat'] = qualifies_bat(p)
         p['_qual_bowl'] = qualifies_bowl(p)
+        p['_fallback_bat'] = p['_fallback_bowl'] = False
 
-        if p['_qual_bat'] and p['season'] in avg_bat:
-            bat = p['_bat']
+        bat = p['_bat']
+        if bat['bf'] > 0 and bat['sr'] is not None and bat['inns'] > 0 and p['season'] in avg_bat and bat['mat'] > 0:
             s_avg = avg_bat[p['season']]
             rpm = bat['runs'] / bat['mat']
             sr = bat['sr']
             bnd = (bat['fours'] + bat['sixes']) / bat['bf'] * 100
-            p['_adj_rpm'] = rpm * (ref_bat['rpm'] / s_avg['rpm'])
-            p['_adj_sr'] = sr * (ref_bat['sr'] / s_avg['sr'])
-            p['_adj_bnd'] = bnd * (ref_bat['bnd'] / s_avg['bnd'])
+            adj_rpm = rpm * (ref_bat['rpm'] / s_avg['rpm'])
+            adj_sr = sr * (ref_bat['sr'] / s_avg['sr'])
+            adj_bnd = bnd * (ref_bat['bnd'] / s_avg['bnd'])
+            if p['_qual_bat']:
+                p['_adj_rpm'], p['_adj_sr'], p['_adj_bnd'] = adj_rpm, adj_sr, adj_bnd
+            else:
+                # FALLBACK: shrink toward the reference season's own league
+                # average (already era-adjusted scale) instead of dropping.
+                conf = bat['bf'] / (bat['bf'] + PRIOR_BALLS_BATTING)
+                p['_adj_rpm'] = conf * adj_rpm + (1 - conf) * ref_bat['rpm']
+                p['_adj_sr'] = conf * adj_sr + (1 - conf) * ref_bat['sr']
+                p['_adj_bnd'] = conf * adj_bnd + (1 - conf) * ref_bat['bnd']
+                p['_fallback_bat'] = True
 
-        if p['_qual_bowl']:
-            avg_pool = avg_bowl_spin if p['_is_spin'] else avg_bowl_pace
-            ref_pool = ref_spin if p['_is_spin'] else ref_pace
-            if p['season'] in avg_pool:
-                bowl = p['_bowl']
-                s_avg = avg_pool[p['season']]
-                wpm = bowl['wickets'] / bowl['mat']
-                econ = bowl['runsconceded'] / (bowl['overs_balls'] / 6)
-                p['_adj_wpm'] = wpm * (ref_pool['wpm'] / s_avg['wpm'])
-                p['_adj_econ'] = econ * (ref_pool['econ'] / s_avg['econ'])
+        avg_pool = avg_bowl_spin if p['_is_spin'] else avg_bowl_pace
+        ref_pool = ref_spin if p['_is_spin'] else ref_pace
+        bowl = p['_bowl']
+        if bowl['overs_balls'] > 0 and bowl['runsconceded'] is not None and p['season'] in avg_pool and bowl['mat'] > 0:
+            s_avg = avg_pool[p['season']]
+            wpm = bowl['wickets'] / bowl['mat']
+            econ = bowl['runsconceded'] / (bowl['overs_balls'] / 6)
+            adj_wpm = wpm * (ref_pool['wpm'] / s_avg['wpm'])
+            adj_econ = econ * (ref_pool['econ'] / s_avg['econ'])
+            if p['_qual_bowl']:
+                p['_adj_wpm'], p['_adj_econ'] = adj_wpm, adj_econ
+            else:
+                conf = bowl['overs_balls'] / (bowl['overs_balls'] + PRIOR_BALLS_BOWLING)
+                p['_adj_wpm'] = conf * adj_wpm + (1 - conf) * ref_pool['wpm']
+                p['_adj_econ'] = conf * adj_econ + (1 - conf) * ref_pool['econ']
+                p['_fallback_bowl'] = True
 
     # ---- global percentile pools (all 19 seasons pooled) ----
-    rpm_pool = Percentiles([p['_adj_rpm'] for p in players if p['_adj_rpm'] is not None])
-    sr_pool = Percentiles([p['_adj_sr'] for p in players if p['_adj_sr'] is not None])
-    bnd_pool = Percentiles([p['_adj_bnd'] for p in players if p['_adj_bnd'] is not None])
-    pace_wpm_pool = Percentiles([p['_adj_wpm'] for p in players if p['_adj_wpm'] is not None and not p['_is_spin']])
-    pace_econ_pool = Percentiles([p['_adj_econ'] for p in players if p['_adj_econ'] is not None and not p['_is_spin']])
-    spin_wpm_pool = Percentiles([p['_adj_wpm'] for p in players if p['_adj_wpm'] is not None and p['_is_spin']])
-    spin_econ_pool = Percentiles([p['_adj_econ'] for p in players if p['_adj_econ'] is not None and p['_is_spin']])
+    # Pools are built from QUALIFYING players only, matching the reference
+    # file's own denominator. Fallback (shrunk) players are ranked against
+    # this pool afterwards - they don't get to widen/shift it themselves.
+    rpm_pool = Percentiles([p['_adj_rpm'] for p in players if p['_adj_rpm'] is not None and p['_qual_bat']])
+    sr_pool = Percentiles([p['_adj_sr'] for p in players if p['_adj_sr'] is not None and p['_qual_bat']])
+    bnd_pool = Percentiles([p['_adj_bnd'] for p in players if p['_adj_bnd'] is not None and p['_qual_bat']])
+    pace_wpm_pool = Percentiles([p['_adj_wpm'] for p in players if p['_adj_wpm'] is not None and p['_qual_bowl'] and not p['_is_spin']])
+    pace_econ_pool = Percentiles([p['_adj_econ'] for p in players if p['_adj_econ'] is not None and p['_qual_bowl'] and not p['_is_spin']])
+    spin_wpm_pool = Percentiles([p['_adj_wpm'] for p in players if p['_adj_wpm'] is not None and p['_qual_bowl'] and p['_is_spin']])
+    spin_econ_pool = Percentiles([p['_adj_econ'] for p in players if p['_adj_econ'] is not None and p['_qual_bowl'] and p['_is_spin']])
 
     for p in players:
         rpm_pct = rpm_pool.of(p['_adj_rpm'])
@@ -227,6 +258,7 @@ def main(season_year):
             bf=p['_bat']['bf'], mat_bat=p['_bat']['mat'],
             bb=p['_bowl']['overs_balls'], mat_bowl=p['_bowl']['mat'], wkts=p['_bowl']['wickets'],
             qual_bat=p['_qual_bat'], qual_bowl=p['_qual_bowl'],
+            fallback_bat=p['_fallback_bat'], fallback_bowl=p['_fallback_bowl'],
             old_bat=old['BattingPower'] if old else None,
             old_fin=old['FinishingPower'] if old else None,
             old_bowl=old['BowlingScore'] if old else None,
@@ -242,15 +274,15 @@ if __name__ == '__main__':
     out_path = f"/tmp/claude-0/-home-user-ipl-300/f3ec677b-388b-598c-a8d1-2914b979aaca/scratchpad/{season_arg}_global_percentile_comparison.csv"
     with open(out_path, 'w', newline='') as f:
         w = csv.writer(f)
-        w.writerow(['Name', 'Team', 'Role', 'MatchesBat', 'BallsFaced', 'QualBat',
-                    'MatchesBowl', 'BallsBowled', 'Wickets', 'QualBowl',
+        w.writerow(['Name', 'Team', 'Role', 'MatchesBat', 'BallsFaced', 'QualBat', 'FallbackBat',
+                    'MatchesBowl', 'BallsBowled', 'Wickets', 'QualBowl', 'FallbackBowl',
                     'OLD_BattingScore', 'NEW_BattingPower',
                     'OLD_FinishingScore', 'NEW_PowerScore',
                     'OLD_BowlingScore', 'NEW_BowlingScore'])
         for r in sorted(rows, key=lambda r: -(r['new_bat'] or r['new_bowl'] or 0)):
             w.writerow([
-                r['name'], r['team'], r['role'], r['mat_bat'], r['bf'], r['qual_bat'],
-                r['mat_bowl'], r['bb'], r['wkts'], r['qual_bowl'],
+                r['name'], r['team'], r['role'], r['mat_bat'], r['bf'], r['qual_bat'], r['fallback_bat'],
+                r['mat_bowl'], r['bb'], r['wkts'], r['qual_bowl'], r['fallback_bowl'],
                 r['old_bat'], r['new_bat'],
                 r['old_fin'], r['new_power'],
                 r['old_bowl'], r['new_bowl'],
@@ -275,8 +307,9 @@ if __name__ == '__main__':
         vals = by_season_bowl[s]
         print(f"  {s}: n={len(vals)} 90+={sum(1 for v in vals if v>=90)} 85+={sum(1 for v in vals if v>=85)}")
 
-    excluded = [p for p in all_players if p['season'] == season_arg and not (p['_qual_bat'] or p['_qual_bowl'])]
+    fallback = [p for p in all_players if p['season'] == season_arg and (p['_fallback_bat'] or p['_fallback_bowl'])]
     print()
-    print(f'{season_arg}: {len(excluded)} players excluded entirely (below both qualification cutoffs):')
-    for p in excluded:
-        print(' ', p['name'], p['team'], 'bat_mat=', p['_bat']['mat'], 'bowl_mat=', p['_bowl']['mat'])
+    print(f'{season_arg}: {len(fallback)} players on the FALLBACK (shrunk-toward-baseline) path:')
+    for p in fallback:
+        print(' ', p['name'], p['team'], 'bat_mat=', p['_bat']['mat'], 'bowl_mat=', p['_bowl']['mat'],
+              'BattingPower=', p['BattingPower'], 'PowerScore=', p['PowerScore'], 'BowlingScore=', p['BowlingScore'])
