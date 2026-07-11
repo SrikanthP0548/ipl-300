@@ -57,10 +57,14 @@ def load_2008():
 def season_totals(players):
     tot_runs = sum(p['_bat']['runs'] for p in players)
     tot_bf = sum(p['_bat']['bf'] for p in players)
+    tot_inns = sum(p['_bat']['inns'] for p in players)
+    tot_no = sum(p['_bat']['no'] for p in players)
+    tot_sixes = sum(p['_bat']['sixes'] for p in players)
     tot_rc = sum(p['_bowl']['runsconceded'] or 0 for p in players if p['_bowl']['overs_balls'] > 0)
     tot_bb = sum(p['_bowl']['overs_balls'] for p in players)
     tot_wk = sum(p['_bowl']['wickets'] for p in players)
-    return dict(runs=tot_runs, bf=tot_bf, rc=tot_rc, bb=tot_bb, wk=tot_wk)
+    return dict(runs=tot_runs, bf=tot_bf, inns=tot_inns, no=tot_no, sixes=tot_sixes,
+                rc=tot_rc, bb=tot_bb, wk=tot_wk)
 
 
 def team_totals(players, team):
@@ -73,6 +77,24 @@ def loo_batting_baseline(totals, player, min_pool_balls=MIN_TEAM_BALLS_FOR_LOO):
     if bf < min_pool_balls:
         return None
     return (runs / bf) * 100
+
+
+def loo_batting_per_innings_baselines(totals, player, min_pool_innings=5):
+    """Season LOO baselines for the per-innings ratios that feed BattingPowerRaw/
+    FinishingPowerRaw: runs/inn, not-outs/inn, sixes/inn, balls/inn."""
+    inns = totals['inns'] - player['_bat']['inns']
+    if inns < min_pool_innings:
+        return None
+    runs = totals['runs'] - player['_bat']['runs']
+    no = totals['no'] - player['_bat']['no']
+    sixes = totals['sixes'] - player['_bat']['sixes']
+    bf = totals['bf'] - player['_bat']['bf']
+    return dict(
+        runs_per_inn=runs / inns,
+        not_out_rate=no / inns,
+        sixes_per_inn=sixes / inns,
+        balls_per_inn=bf / inns,
+    )
 
 
 def loo_bowling_baseline(totals, player, min_pool_balls=MIN_TEAM_BALLS_FOR_LOO):
@@ -88,7 +110,7 @@ def loo_bowling_baseline(totals, player, min_pool_balls=MIN_TEAM_BALLS_FOR_LOO):
     return dict(economy=economy, wicket_rate=wicket_rate, avg=bowl_avg, sr=bowl_sr)
 
 
-def new_batting_raw(player, season_loo_sr, team_loo_sr):
+def new_batting_raw(player, season_loo_sr, team_loo_sr, season_loo_per_inn):
     bat = player['_bat']
     if bat['inns'] <= 0 or bat['sr'] is None or bat['bf'] <= 0:
         return None, None
@@ -98,13 +120,32 @@ def new_batting_raw(player, season_loo_sr, team_loo_sr):
     team_ref = team_loo_sr if team_loo_sr is not None else season_loo_sr
     adjusted_sr_index = 0.70 * (shrunk_sr / season_loo_sr) + 0.30 * (shrunk_sr / team_ref)
 
-    runs_per_inn = bat['runs'] / bat['inns']
+    # Every per-innings ratio below is computed from the same small sample
+    # (Innings) as runs_per_inn was — shrink all of them with the same
+    # BallsFaced-based confidence before they feed the raw formulas, rather
+    # than singling out runs_per_inn. This is what replaces FinishSample's
+    # old (crude) role.
+    observed_runs_per_inn = bat['runs'] / bat['inns']
+    observed_not_out_rate = bat['no'] / bat['inns']
+    observed_sixes_per_inn = bat['sixes'] / bat['inns']
+    observed_balls_per_inn = (bat['bf'] / bat['inns']) if bat['bf'] else None
+
+    if season_loo_per_inn is not None:
+        runs_per_inn = confidence * observed_runs_per_inn + (1 - confidence) * season_loo_per_inn['runs_per_inn']
+        not_out_rate = confidence * observed_not_out_rate + (1 - confidence) * season_loo_per_inn['not_out_rate']
+        sixes_per_inn = confidence * observed_sixes_per_inn + (1 - confidence) * season_loo_per_inn['sixes_per_inn']
+        balls_per_inn = (
+            confidence * observed_balls_per_inn + (1 - confidence) * season_loo_per_inn['balls_per_inn']
+            if observed_balls_per_inn is not None else None
+        )
+    else:
+        runs_per_inn, not_out_rate, sixes_per_inn, balls_per_inn = (
+            observed_runs_per_inn, observed_not_out_rate, observed_sixes_per_inn, observed_balls_per_inn,
+        )
+
     consistency = 1 + (bat['fifties'] * 0.04) + (bat['hundreds'] * 0.08)
     batting_raw = runs_per_inn * adjusted_sr_index * consistency
 
-    not_out_rate = bat['no'] / bat['inns']
-    sixes_per_inn = bat['sixes'] / bat['inns']
-    balls_per_inn = (bat['bf'] / bat['inns']) if bat['bf'] else None
     not_out_idx = 1 + min(0.30, not_out_rate)
     boundary_idx = 1 + min(0.30, sixes_per_inn * 0.06)
     ball_eff_idx = 1 + min(0.20, max(0.0, (25 - balls_per_inn) / 50)) if balls_per_inn is not None else 1.0
@@ -184,9 +225,10 @@ def main():
         season_loo_sr = loo_batting_baseline(season, p)
         tt = team_tot[p['team']]
         team_loo_sr = loo_batting_baseline(tt, p)
+        season_loo_per_inn = loo_batting_per_innings_baselines(season, p)
         new_bat_raw, new_fin_raw = (None, None)
         if season_loo_sr:
-            new_bat_raw, new_fin_raw = new_batting_raw(p, season_loo_sr, team_loo_sr)
+            new_bat_raw, new_fin_raw = new_batting_raw(p, season_loo_sr, team_loo_sr, season_loo_per_inn)
 
         team_loo_bowl = loo_bowling_baseline(tt, p)
         new_bowl_raw, new_econ_raw = new_bowling_raw(p, season_loo_bowl, team_loo_bowl)
