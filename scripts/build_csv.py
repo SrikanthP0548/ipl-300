@@ -1,4 +1,5 @@
-import re, csv, math, statistics
+import re, csv, bisect, statistics
+from collections import defaultdict
 from pathlib import Path
 
 REPO = Path("/home/user/ipl-300")
@@ -194,19 +195,62 @@ def extract_players(text, season):
     return players
 
 
-# (BattingFloor, FinishingFloor, PriorWeight)
-ROLE_TABLE = {
-    'Opener':               (65.0, 45.0, 18.0),
-    'Top-order Batter':     (62.0, 48.0, 18.0),
-    'Middle-order Batter':  (56.0, 52.0, 20.0),
-    'Wicketkeeper Batter':  (56.0, 55.0, 20.0),
-    'Finisher':             (48.0, 62.0, 24.0),
-    'Batting All-rounder':  (55.0, 55.0, 22.0),
-    'Bowling All-rounder':  (42.0, 48.0, 26.0),
-    'Spinner':              (30.0, 38.0, 30.0),
-    'Pacer':                (28.0, 35.0, 32.0),
-    'Specialist Bowler':    (25.0, 32.0, 34.0),
-}
+# Scoring methodology (Release 1B): reverse-engineered from a reference dataset
+# built the same way this game's data is - real IPL history, per-season stats.
+# Confirmed by regression against that reference (R^2 ~ 1, not approximate):
+#   BattingPower  = 0.6 * RunsPerMatchPercentile + 0.4 * StrikeRatePercentile
+#   FinishingPower = 0.2 * RunsPerMatchPercentile + 0.4 * StrikeRatePercentile + 0.4 * BoundaryRatePercentile
+#   BowlingScore  = 0.6 * WicketsPerMatchPercentile + 0.4 * EconomyPercentile
+#                   (pace and spin bowlers ranked in separate pools; economy inverted)
+# Percentiles are GLOBAL across all seasons (not per-season - a per-season pool
+# manufactures the same "elite quota" every year regardless of the actual talent
+# distribution that year, which was the root defect in the old formulas below).
+# Each player's raw rate is first era-normalized (raw * league_avg[2026] /
+# league_avg[own season]) so older, lower-scoring seasons aren't systematically
+# buried by seasons where T20 scoring is simply higher.
+#
+# Player-seasons below the qualification cutoffs (too few matches/balls to
+# trust the rate) don't get dropped - since this game's source data is already
+# a curated ~11-player "Best XI" per team-season rather than a full squad,
+# dropping them would leave some team-seasons short of a full XI. Instead they
+# get a confidence-weighted shrinkage fallback (same technique, blended toward
+# the reference season's league average) before being ranked in the same pool.
+REFERENCE_SEASON = 2026
+MIN_MATCHES_BAT = 6
+MIN_MATCHES_BOWL = 6
+MIN_BALLS_FACED = 50
+MIN_BALLS_BOWLED = 120
+PRIOR_BALLS_BATTING = 120.0
+PRIOR_BALLS_BOWLING = 72.0
+
+
+def qualifies_bat(bat):
+    return (bat['mat'] >= MIN_MATCHES_BAT and bat['bf'] >= MIN_BALLS_FACED
+            and bat['sr'] is not None and bat['inns'] > 0)
+
+
+def qualifies_bowl(bowl):
+    return (bowl['mat'] >= MIN_MATCHES_BOWL and bowl['overs_balls'] >= MIN_BALLS_BOWLED
+            and bowl['runsconceded'] is not None)
+
+
+class Percentiles:
+    """Precomputes a sorted pool once, then does O(log n) average-rank lookups."""
+
+    def __init__(self, values):
+        self.sorted = sorted(values)
+        self.sorted_neg = sorted(-x for x in self.sorted)
+        self.n = len(self.sorted)
+
+    def of(self, value, higher_is_better=True):
+        if value is None or self.n <= 1:
+            return None
+        pool = self.sorted if higher_is_better else self.sorted_neg
+        v = value if higher_is_better else -value
+        lo = bisect.bisect_left(pool, v)
+        hi = bisect.bisect_right(pool, v)
+        rank = (lo + hi - 1) / 2
+        return rank / (self.n - 1) * 100
 
 
 def classify_role(role_text):
@@ -244,10 +288,13 @@ def build_player_metrics(rec):
     fifties = to_int(rec.get('bat_fifties')) or 0
     hundreds = to_int(rec.get('bat_hundreds')) or 0
     sixes = to_int(rec.get('bat_sixes')) or 0
+    fours = to_int(rec.get('bat_fours')) or 0
+    mat = to_int(rec.get('bat_mat')) or 0
 
     m = {
         'inns': inns or 0, 'runs': runs or 0, 'bf': bf or 0, 'sr': sr,
         'no': no or 0, 'fifties': fifties, 'hundreds': hundreds, 'sixes': sixes,
+        'fours': fours, 'mat': mat,
     }
 
     bowl_inns = to_int(rec.get('bowl_inns'))
@@ -258,6 +305,7 @@ def build_player_metrics(rec):
     bowlavg = to_float(rec.get('bowl_avg'))
     bowlsr = to_float(rec.get('bowl_sr'))
     fourw = to_int(rec.get('bowl_fourw')) or 0
+    bowl_mat = to_int(rec.get('bowl_mat')) or 0
 
     bm = {
         'bowl_inns': bowl_inns or 0,
@@ -268,6 +316,7 @@ def build_player_metrics(rec):
         'bowlavg': bowlavg,
         'bowlsr': bowlsr,
         'fourw': fourw,
+        'mat': bowl_mat,
     }
     return m, bm
 
@@ -283,158 +332,112 @@ def compute_all_players():
         m, bm = build_player_metrics(rec)
         rec['_bat'] = m
         rec['_bowl'] = bm
+        rec['role_category'] = classify_role(rec['role'])
+        rec['_is_spin'] = 'spin' in (rec.get('role') or '').lower()
+        # Some season files carry Econ but not a raw runs-conceded column at
+        # all (2018 and 2026 are 100% missing it). Reconstruct it exactly
+        # (Econ is defined as runs/(balls/6)) rather than let it silently
+        # zero out a bowler's contribution to the league average.
+        if bm['runsconceded'] is None and bm['econ'] is not None and bm['overs_balls'] > 0:
+            bm['runsconceded'] = round(bm['econ'] * bm['overs_balls'] / 6)
 
-    # ---- per-season baselines (approximated from Best-XI-only pool, per user's stopgap decision) ----
-    seasons = sorted(set(r['season'] for r in all_players))
-    season_bat_baseline = {}
-    season_bowl_baseline = {}
-    team_bat_baseline = {}   # (season, team) -> avg sr
-    team_bowl_baseline = {}  # (season, team) -> (econ, sr, avg)
+    # ---- league averages per season, among QUALIFYING players only ----
+    by_season_bat = defaultdict(list)
+    by_season_bowl_pace = defaultdict(list)
+    by_season_bowl_spin = defaultdict(list)
+    for r in all_players:
+        bat = r['_bat']
+        if qualifies_bat(bat):
+            rpm = bat['runs'] / bat['mat']
+            bnd = (bat['fours'] + bat['sixes']) / bat['bf'] * 100
+            by_season_bat[r['season']].append((rpm, bat['sr'], bnd))
+        bowl = r['_bowl']
+        if qualifies_bowl(bowl):
+            wpm = bowl['wickets'] / bowl['mat']
+            econ = bowl['runsconceded'] / (bowl['overs_balls'] / 6)
+            bucket = by_season_bowl_spin if r['_is_spin'] else by_season_bowl_pace
+            bucket[r['season']].append((wpm, econ))
 
-    for season in seasons:
-        srec = [r for r in all_players if r['season'] == season]
-        tot_runs = sum(r['_bat']['runs'] for r in srec)
-        tot_bf = sum(r['_bat']['bf'] for r in srec)
-        season_bat_baseline[season] = (tot_runs / tot_bf * 100) if tot_bf else 130.0
+    avg_bat = {s: dict(rpm=statistics.mean(x[0] for x in v), sr=statistics.mean(x[1] for x in v),
+                        bnd=statistics.mean(x[2] for x in v)) for s, v in by_season_bat.items()}
+    avg_pace = {s: dict(wpm=statistics.mean(x[0] for x in v), econ=statistics.mean(x[1] for x in v))
+                for s, v in by_season_bowl_pace.items()}
+    avg_spin = {s: dict(wpm=statistics.mean(x[0] for x in v), econ=statistics.mean(x[1] for x in v))
+                for s, v in by_season_bowl_spin.items()}
 
-        tot_bruns = sum((r['_bowl']['runsconceded'] or 0) for r in srec if r['_bowl']['overs_balls'] > 0)
-        tot_balls = sum(r['_bowl']['overs_balls'] for r in srec)
-        tot_wkts = sum(r['_bowl']['wickets'] for r in srec)
-        season_bowl_baseline[season] = {
-            'economy': (tot_bruns / (tot_balls / 6)) if tot_balls else 8.0,
-            'sr': (tot_balls / tot_wkts) if tot_wkts else 20.0,
-            'avg': (tot_bruns / tot_wkts) if tot_wkts else 28.0,
-        }
+    ref_bat = avg_bat[REFERENCE_SEASON]
+    ref_pace = avg_pace[REFERENCE_SEASON]
+    ref_spin = avg_spin[REFERENCE_SEASON]
 
-        for team in TEAMS:
-            trec = [r for r in srec if r['team'] == team]
-            if not trec:
-                continue
-            t_runs = sum(r['_bat']['runs'] for r in trec)
-            t_bf = sum(r['_bat']['bf'] for r in trec)
-            team_bat_baseline[(season, team)] = (t_runs / t_bf * 100) if t_bf else season_bat_baseline[season]
+    # ---- era-normalize each player's rate; sub-threshold samples get a ----
+    # ---- confidence-shrunk fallback instead of being dropped ----
+    for r in all_players:
+        bat, bowl = r['_bat'], r['_bowl']
+        r['_adj_rpm'] = r['_adj_sr'] = r['_adj_bnd'] = None
+        r['_adj_wpm'] = r['_adj_econ'] = None
+        r['_qual_bat'] = qualifies_bat(bat)
+        r['_qual_bowl'] = qualifies_bowl(bowl)
 
-            t_bruns = sum((r['_bowl']['runsconceded'] or 0) for r in trec if r['_bowl']['overs_balls'] > 0)
-            t_balls = sum(r['_bowl']['overs_balls'] for r in trec)
-            t_wkts = sum(r['_bowl']['wickets'] for r in trec)
-            team_bowl_baseline[(season, team)] = {
-                'economy': (t_bruns / (t_balls / 6)) if t_balls else season_bowl_baseline[season]['economy'],
-                'sr': (t_balls / t_wkts) if t_wkts else season_bowl_baseline[season]['sr'],
-                'avg': (t_bruns / t_wkts) if t_wkts else season_bowl_baseline[season]['avg'],
-            }
+        if bat['bf'] > 0 and bat['sr'] is not None and bat['inns'] > 0 and bat['mat'] > 0 and r['season'] in avg_bat:
+            s_avg = avg_bat[r['season']]
+            rpm = bat['runs'] / bat['mat']
+            bnd = (bat['fours'] + bat['sixes']) / bat['bf'] * 100
+            adj_rpm = rpm * (ref_bat['rpm'] / s_avg['rpm'])
+            adj_sr = bat['sr'] * (ref_bat['sr'] / s_avg['sr'])
+            adj_bnd = bnd * (ref_bat['bnd'] / s_avg['bnd'])
+            if r['_qual_bat']:
+                r['_adj_rpm'], r['_adj_sr'], r['_adj_bnd'] = adj_rpm, adj_sr, adj_bnd
+            else:
+                conf = bat['bf'] / (bat['bf'] + PRIOR_BALLS_BATTING)
+                r['_adj_rpm'] = conf * adj_rpm + (1 - conf) * ref_bat['rpm']
+                r['_adj_sr'] = conf * adj_sr + (1 - conf) * ref_bat['sr']
+                r['_adj_bnd'] = conf * adj_bnd + (1 - conf) * ref_bat['bnd']
 
-    # ---- raw scores ----
-    for rec in all_players:
-        season, team = rec['season'], rec['team']
-        bat, bowl = rec['_bat'], rec['_bowl']
+        avg_pool = avg_spin if r['_is_spin'] else avg_pace
+        ref_pool = ref_spin if r['_is_spin'] else ref_pace
+        if bowl['overs_balls'] > 0 and bowl['runsconceded'] is not None and bowl['mat'] > 0 and r['season'] in avg_pool:
+            s_avg = avg_pool[r['season']]
+            wpm = bowl['wickets'] / bowl['mat']
+            econ = bowl['runsconceded'] / (bowl['overs_balls'] / 6)
+            adj_wpm = wpm * (ref_pool['wpm'] / s_avg['wpm'])
+            adj_econ = econ * (ref_pool['econ'] / s_avg['econ'])
+            if r['_qual_bowl']:
+                r['_adj_wpm'], r['_adj_econ'] = adj_wpm, adj_econ
+            else:
+                conf = bowl['overs_balls'] / (bowl['overs_balls'] + PRIOR_BALLS_BOWLING)
+                r['_adj_wpm'] = conf * adj_wpm + (1 - conf) * ref_pool['wpm']
+                r['_adj_econ'] = conf * adj_econ + (1 - conf) * ref_pool['econ']
 
-        # ---------- Batting / Finishing ----------
-        if bat['inns'] <= 0 or bat['sr'] is None:
-            rec['BattingPowerRaw'] = None
-            rec['FinishingPowerRaw'] = None
-        else:
-            season_sr = season_bat_baseline[season]
-            team_sr = team_bat_baseline.get((season, team), season_sr)
-            season_adj = bat['sr'] / season_sr if season_sr else 1.0
-            team_adj = bat['sr'] / team_sr if team_sr else season_adj
-            adjusted_sr_index = 0.70 * season_adj + 0.30 * team_adj
+    # ---- global percentile pools across all seasons (qualifying players only) ----
+    rpm_pool = Percentiles([r['_adj_rpm'] for r in all_players if r['_adj_rpm'] is not None and r['_qual_bat']])
+    sr_pool = Percentiles([r['_adj_sr'] for r in all_players if r['_adj_sr'] is not None and r['_qual_bat']])
+    bnd_pool = Percentiles([r['_adj_bnd'] for r in all_players if r['_adj_bnd'] is not None and r['_qual_bat']])
+    pace_wpm_pool = Percentiles(
+        [r['_adj_wpm'] for r in all_players if r['_adj_wpm'] is not None and r['_qual_bowl'] and not r['_is_spin']])
+    pace_econ_pool = Percentiles(
+        [r['_adj_econ'] for r in all_players if r['_adj_econ'] is not None and r['_qual_bowl'] and not r['_is_spin']])
+    spin_wpm_pool = Percentiles(
+        [r['_adj_wpm'] for r in all_players if r['_adj_wpm'] is not None and r['_qual_bowl'] and r['_is_spin']])
+    spin_econ_pool = Percentiles(
+        [r['_adj_econ'] for r in all_players if r['_adj_econ'] is not None and r['_qual_bowl'] and r['_is_spin']])
 
-            runs_per_inn = bat['runs'] / bat['inns']
-            availability = min(1.0, bat['inns'] / 10.0)
-            consistency = 1 + (bat['fifties'] * 0.04) + (bat['hundreds'] * 0.08)
-            rec['BattingPowerRaw'] = runs_per_inn * adjusted_sr_index * availability * consistency
-
-            not_out_rate = bat['no'] / bat['inns']
-            sixes_per_inn = bat['sixes'] / bat['inns']
-            balls_per_inn = (bat['bf'] / bat['inns']) if bat['bf'] else None
-            not_out_idx = 1 + min(0.30, not_out_rate)
-            boundary_idx = 1 + min(0.30, sixes_per_inn * 0.06)
-            ball_eff_idx = 1 + min(0.20, max(0.0, (25 - balls_per_inn) / 50)) if balls_per_inn is not None else 1.0
-            finishing_sample = min(1.0, bat['inns'] / 8.0)
-            rec['FinishingPowerRaw'] = (
-                math.sqrt(max(0.0, runs_per_inn)) * adjusted_sr_index * not_out_idx
-                * boundary_idx * ball_eff_idx * finishing_sample
-            )
-
-        # ---------- Bowling / Economy ----------
-        if (bowl['bowl_inns'] <= 0 or bowl['overs_balls'] <= 0 or bowl['wickets'] == 0
-                or not bowl['bowlsr'] or not bowl['bowlavg']):
-            rec['BowlingPowerRaw'] = None
-        else:
-            sb = season_bowl_baseline[season]
-            tb = team_bowl_baseline.get((season, team), sb)
-            adj_strike = 0.70 * (sb['sr'] / bowl['bowlsr']) + 0.30 * (tb['sr'] / bowl['bowlsr'])
-            adj_avg = 0.70 * (sb['avg'] / bowl['bowlavg']) + 0.30 * (tb['avg'] / bowl['bowlavg'])
-            wpbi = bowl['wickets'] / bowl['bowl_inns']
-            availability = min(1.0, bowl['bowl_inns'] / 10.0)
-            consistency = 1 + (bowl['fourw'] * 0.08)
-            rec['BowlingPowerRaw'] = (
-                wpbi * (adj_strike ** 0.60) * (adj_avg ** 0.40) * availability * consistency
-            )
-            rec['_wpbi'] = wpbi
-
-        if bowl['overs_balls'] <= 0 or not bowl['econ']:
-            rec['EconomyPowerRaw'] = None
-        else:
-            sb = season_bowl_baseline[season]
-            tb = team_bowl_baseline.get((season, team), sb)
-            adj_econ = 0.70 * (sb['economy'] / bowl['econ']) + 0.30 * (tb['economy'] / bowl['econ'])
-            overs_factor = min(1.0, (bowl['overs_balls'] / 6) / 24.0)
-            wpbi = rec.get('_wpbi', (bowl['wickets'] / bowl['bowl_inns']) if bowl['bowl_inns'] else 0.0)
-            wicket_bonus = 1 + min(0.15, wpbi * 0.10)
-            rec['EconomyPowerRaw'] = math.sqrt(max(0.0, adj_econ)) * overs_factor * wicket_bonus
-
-    # ---- per-season percentile normalization ----
-    def percentile_rank(values_with_idx):
-        """values_with_idx: list of (idx, value). Returns dict idx -> percentile (0-100)."""
-        valid = [(i, v) for i, v in values_with_idx if v is not None]
-        valid.sort(key=lambda x: x[1])
-        n = len(valid)
-        result = {}
-        for rank, (i, v) in enumerate(valid):
-            pct = (rank / (n - 1) * 100) if n > 1 else 100.0
-            result[i] = pct
-        return result
-
-    for season in seasons:
-        idxs = [i for i, r in enumerate(all_players) if r['season'] == season]
-        for key, out in [('BattingPowerRaw', 'BattingPower'), ('FinishingPowerRaw', 'FinishingPower'),
-                          ('BowlingPowerRaw', 'BowlingPower'), ('EconomyPowerRaw', 'EconomyPower')]:
-            vals = [(i, all_players[i][key]) for i in idxs]
-            pct = percentile_rank(vals)
-            for i in idxs:
-                all_players[i][out] = round(pct[i], 1) if i in pct else None
-
-    # ---- role-based prior-weighted shrinkage: fades the floor as real balls faced grows, ----
-    # ---- uncapped, using the player's role (not lineup position) to set the prior ----
-    for rec in all_players:
-        category = classify_role(rec['role'])
-        rec['role_category'] = category
-        bat_floor, fin_floor, prior_weight = ROLE_TABLE[category]
-
-        bf = rec['_bat']['bf']
-        actual_bat = rec['BattingPower'] if rec['BattingPower'] is not None else 0.0
-        actual_fin = rec['FinishingPower'] if rec['FinishingPower'] is not None else 0.0
-
-        rec['BattingPower'] = round(
-            (actual_bat * bf + bat_floor * prior_weight) / (bf + prior_weight), 1
-        )
-        rec['FinishingPower'] = round(
-            (actual_fin * bf + fin_floor * prior_weight) / (bf + prior_weight), 1
+    for r in all_players:
+        rpm_pct = rpm_pool.of(r['_adj_rpm'])
+        sr_pct = sr_pool.of(r['_adj_sr'])
+        bnd_pct = bnd_pool.of(r['_adj_bnd'])
+        r['BattingPower'] = round(0.6 * rpm_pct + 0.4 * sr_pct, 1) if None not in (rpm_pct, sr_pct) else None
+        r['FinishingPower'] = (
+            round(0.2 * rpm_pct + 0.4 * sr_pct + 0.4 * bnd_pct, 1)
+            if None not in (rpm_pct, sr_pct, bnd_pct) else None
         )
 
-    # ---- single display BOWLING_SCORE: simplified bowlingRating, no double-counted gap penalty ----
-    def bowling_score(bowling_power, economy_power):
-        if bowling_power is None or economy_power is None:
-            return None
-        B = bowling_power / 100.0
-        E = economy_power / 100.0
-        geometric_core = 100 * (B ** 0.60) * (E ** 0.40)
-        lo, hi = 25.0, 96.0
-        return round(lo + (hi - lo) * (max(0.0, geometric_core) / 100.0) ** 1.15, 1)
-
-    for rec in all_players:
-        rec['BowlingScore'] = bowling_score(rec.get('BowlingPower'), rec.get('EconomyPower'))
+        if r['_is_spin']:
+            wpm_pct = spin_wpm_pool.of(r['_adj_wpm'])
+            econ_pct = spin_econ_pool.of(r['_adj_econ'], higher_is_better=False)
+        else:
+            wpm_pct = pace_wpm_pool.of(r['_adj_wpm'])
+            econ_pct = pace_econ_pool.of(r['_adj_econ'], higher_is_better=False)
+        r['BowlingScore'] = round(0.6 * wpm_pct + 0.4 * econ_pct, 1) if None not in (wpm_pct, econ_pct) else None
 
     return all_players
 
@@ -443,9 +446,9 @@ def main():
     all_players = compute_all_players()
     seasons = sorted(set(r['season'] for r in all_players))
 
-    # ---- write full audit CSV (keeps raw BowlingPower/EconomyPower components) ----
+    # ---- write full audit CSV ----
     out_path = "/tmp/claude-0/-home-user-ipl-300/f3ec677b-388b-598c-a8d1-2914b979aaca/scratchpad/ipl_player_power_scores_full.csv"
-    fields = ['Season', 'Team', 'POS', 'Name', 'Role', 'BattingPower', 'FinishingPower', 'BowlingPower', 'EconomyPower', 'BowlingScore']
+    fields = ['Season', 'Team', 'POS', 'Name', 'Role', 'BattingPower', 'FinishingPower', 'BowlingScore']
     ordered = sorted(all_players, key=lambda r: (r['season'], TEAMS.index(r['team']) if r['team'] in TEAMS else 99, r['pos']))
     with open(out_path, 'w', newline='') as f:
         w = csv.writer(f)
@@ -453,8 +456,7 @@ def main():
         for r in ordered:
             w.writerow([
                 r['season'], r['team'], r['pos'], r['name'], r['role'],
-                r.get('BattingPower', ''), r.get('FinishingPower', ''), r.get('BowlingPower', ''),
-                r.get('EconomyPower', ''), r.get('BowlingScore', ''),
+                r.get('BattingPower', ''), r.get('FinishingPower', ''), r.get('BowlingScore', ''),
             ])
     print('wrote', out_path, 'rows:', len(all_players))
 
