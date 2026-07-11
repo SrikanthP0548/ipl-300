@@ -40,7 +40,12 @@ from build_csv import (
 )
 
 PRIOR_BALLS_BATTING = 120.0
-PRIOR_BALLS_BOWLING = 48.0
+# 12 overs. Tested against 48/72/96/120/144: 72 is where single-over flukes
+# (e.g. 1 wicket for 3 runs off one over) stop ranking near the top of the
+# bowling pool; beyond ~96 there's no further improvement (a real property
+# of confidence-weighted shrinkage, not a tuning gap — see the 2008 sample
+# investigation), so no benefit to going higher.
+PRIOR_BALLS_BOWLING = 72.0
 MIN_TEAM_BALLS_FOR_LOO = 20  # fallback to season baseline below this
 
 
