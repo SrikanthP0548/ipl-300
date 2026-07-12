@@ -891,8 +891,19 @@
 }
 
 /* ---------- Chase page ---------- */
+/* Fixed-shell layout: header + scoreboard pinned at top, controls pinned at
+ * bottom, only the ball-by-ball ticker scrolls in between. Overrides .page's
+ * natural document-flow height (min-height: 100vh, grows with content) with
+ * an actual bounded height + overflow: hidden, so .chase-layout's flex:1
+ * child has a real ceiling to size against instead of just growing forever. */
+.chase-page {
+  height: 100vh;
+  max-height: 900px;
+  overflow: hidden;
+}
 
 .chase-header {
+  flex-shrink: 0;
   margin-bottom: 14px;
 }
 .chase-title {
@@ -927,6 +938,7 @@
 }
 
 .scoreboard-panel {
+  flex-shrink: 0;
   padding: 20px;
   border-radius: 14px;
   background: var(--surface);
@@ -1048,9 +1060,11 @@
 .ticker-panel {
   display: flex;
   flex-direction: column;
+  flex: 1;
   min-height: 0;
 }
 .ticker-heading {
+  flex-shrink: 0;
   font-family: var(--font-display);
   font-size: 13px;
   font-weight: 700;
@@ -1062,8 +1076,7 @@
 .event-ticker {
   flex: 1;
   overflow-y: auto;
-  min-height: 200px;
-  max-height: 420px;
+  min-height: 0;
 }
 .event-row {
   display: flex;
@@ -1123,6 +1136,7 @@
 }
 
 .chase-controls {
+  flex-shrink: 0;
   display: flex;
   gap: 10px;
   padding-top: 14px;
