@@ -5,21 +5,23 @@ import type { Player } from './types';
  * percentile, see scripts/build_csv.py). The draft mechanic - pick the best
  * legally-fitting player per slot out of a 15-team-season pool - is powerful
  * enough that even a naive greedy draft strategy reliably assembles a team
- * near the top of the score distribution (simulated 4000 greedy drafts
+ * near the top of the score distribution (simulated 6000 greedy drafts
  * against the live game_data.json: top-7 batting/finishing and bottom-4
  * bowling averages cluster tightly in the low-mid 80s to low 90s, p10-p90).
- * These three averages are set to that simulation's p75 mark individually.
- * Because the metrics are correlated but not identical, requiring all three
- * simultaneously is considerably more selective than 75% on its own -
- * empirically about 2.4% of simulated drafts clear all three at once (down
- * from ~87% under the old thresholds against this same scoring model) -
- * which is the intended effect: chasing 301 should be a rare, earned outcome,
- * not something most competent drafts stumble into via the flat win lottery.
+ *
+ * Because these three metrics are correlated but not identical, requiring
+ * all three simultaneously is considerably more selective than any single
+ * one of them alone - setting each to its own individual p75 mark compounds
+ * to a ~2.4% joint pass rate, not 25%. The target here is a ~10-12% joint
+ * pass rate (eligibility should be a real accomplishment, not the default
+ * outcome, but not vanishingly rare either), which the same simulation
+ * shows corresponds to each threshold sitting at its own individual ~p55
+ * mark (p50 -> 14.3% joint, p55 -> 11.0% joint, p58 -> 9.3% joint).
  */
 export const THRESHOLDS = {
-  TOP_BATTING_AVG: 86.9,
-  TOP_FINISHING_AVG: 89.5,
-  BOTTOM_BOWLING_AVG: 90.3,
+  TOP_BATTING_AVG: 85.5,
+  TOP_FINISHING_AVG: 88.2,
+  BOTTOM_BOWLING_AVG: 88.2,
   REAL_BOWLER_MIN_SCORE: 40,
   MIN_REAL_BOWLERS: 3,
 };
