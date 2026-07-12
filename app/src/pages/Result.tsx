@@ -34,9 +34,9 @@ export function Result() {
 
   const onTryAgain = async () => {
     setRetrying(true);
-    await startSession();
+    const ok = await startSession();
     setRetrying(false);
-    navigate('/build');
+    if (ok) navigate('/build');
   };
 
   const onShare = async () => {

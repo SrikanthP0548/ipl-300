@@ -364,7 +364,15 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 10px;
   margin-top: 16px;
+  flex-wrap: wrap;
+}
+.header-chip-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 .toggle-scores-btn {
   border: 1px solid var(--border-strong);
@@ -381,8 +389,8 @@
 
 .slot-strip {
   display: flex;
+  flex-wrap: wrap;
   gap: 7px;
-  overflow-x: auto;
   padding: 10px 0 12px;
   border-bottom: 1px solid var(--border);
   margin-bottom: 12px;
@@ -426,14 +434,14 @@
 
 .detail-card,
 .player-card {
-  padding: 16px;
   border-radius: 12px;
   background: var(--surface);
   border: 1.5px solid var(--border);
-  margin-bottom: 12px;
   animation: cardIn 0.3s ease;
 }
 .detail-card {
+  padding: 16px;
+  margin-bottom: 12px;
   border-color: var(--border-strong);
 }
 .detail-card-top,
@@ -520,12 +528,22 @@
   animation-delay: 0.4s;
 }
 
+.team-header {
+  position: relative;
+  padding: 12px 0 14px;
+  border-bottom: 3px solid color-mix(in srgb, var(--card-accent, var(--gold)) 50%, transparent);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--card-accent, var(--gold)) 15%, transparent),
+    color-mix(in srgb, var(--card-accent, var(--gold)) 2%, transparent) 55%,
+    transparent 100%
+  );
+}
 .team-banner {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 10px 0 4px;
 }
 .team-banner-name {
   font-family: var(--font-display);
@@ -537,12 +555,12 @@
 .team-banner-hint {
   font-size: 12.5px;
   color: var(--text-muted);
-  margin-bottom: 10px;
+  margin-top: 6px;
 }
 .skip-btn {
   flex-shrink: 0;
-  border: 1px solid var(--border-strong);
-  background: var(--surface);
+  border: 1.5px solid color-mix(in srgb, var(--card-accent, var(--gold)) 50%, transparent);
+  background: color-mix(in srgb, var(--card-accent, var(--gold)) 12%, transparent);
   border-radius: 8px;
   padding: 8px 14px;
   cursor: pointer;
@@ -550,11 +568,15 @@
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.5px;
-  color: var(--text-secondary);
+  color: var(--card-accent, var(--gold));
   text-transform: uppercase;
+  box-shadow: 0 0 12px color-mix(in srgb, var(--card-accent, var(--gold)) 19%, transparent);
 }
 .skip-btn:disabled {
-  opacity: 0.4;
+  border-color: var(--border);
+  background: var(--surface);
+  color: var(--text-disabled);
+  box-shadow: none;
   cursor: not-allowed;
 }
 
@@ -562,11 +584,27 @@
   padding-bottom: 12px;
 }
 .player-card {
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  border-left: 5px solid var(--card-accent, var(--gold));
   cursor: pointer;
+}
+.player-card.expanded {
+  background: var(--surface-strong);
+  border-color: rgba(242, 180, 65, 0.4);
+  border-left-color: var(--card-accent, var(--gold));
 }
 .player-card.disabled {
   opacity: 0.4;
   cursor: not-allowed;
+}
+.player-card .player-name {
+  font-size: 14.5px;
+}
+.player-name-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 .player-name {
   font-size: 16px;
@@ -576,21 +614,35 @@
 .player-meta {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   margin-top: 6px;
 }
 .range-label {
   font-family: var(--font-display);
-  font-size: 12px;
+  font-size: 10.5px;
   font-weight: 700;
   color: var(--text-faint);
   letter-spacing: 0.5px;
+  white-space: nowrap;
 }
 .player-stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 10px;
   margin-top: 14px;
+}
+.player-card .player-stats {
+  gap: 6px;
+  margin-top: 8px;
+}
+.player-card .score-box {
+  padding: 5px 6px;
+}
+.player-card .score-label {
+  font-size: 8.5px;
+}
+.player-card .score-value {
+  font-size: 16px;
 }
 
 .position-picker {
@@ -658,9 +710,200 @@
   width: 100%;
 }
 
+/* ---------- Build XI: desktop two-pane layout ---------- */
+
+.buildxi-page-desktop {
+  padding: 0;
+  height: calc(100vh - 48px);
+  max-height: 900px;
+}
+.desktop-topbar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28px 40px;
+  border-bottom: 1px solid var(--border);
+}
+.desktop-topbar-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 28px;
+  letter-spacing: -0.5px;
+  color: var(--text-primary);
+}
+.desktop-topbar-subtitle {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  margin-left: 14px;
+  text-transform: uppercase;
+}
+.desktop-body {
+  position: relative;
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+.desktop-rail {
+  position: relative;
+  width: 320px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--border);
+  padding: 24px;
+  overflow-y: auto;
+}
+.desktop-rail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.desktop-slot-list {
+  display: flex;
+  flex-direction: column;
+}
+.desktop-slot-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 6px;
+  border-radius: 8px;
+  border-bottom: 1px solid var(--border);
+  animation: slotPop 0.25s ease;
+}
+.desktop-slot-row.selected {
+  background: rgba(34, 211, 198, 0.12);
+}
+.desktop-slot-n {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-faint);
+  width: 18px;
+  flex-shrink: 0;
+}
+.desktop-slot-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--border-strong);
+}
+.desktop-slot-name {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-disabled);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.desktop-slot-name.filled {
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+.detail-scrim {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 6, 14, 0.6);
+  z-index: 40;
+  backdrop-filter: blur(2px);
+}
+.detail-card.desktop-detail-popup {
+  position: absolute;
+  left: 24px;
+  right: 24px;
+  top: 120px;
+  z-index: 41;
+  box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.65);
+}
+.desktop-draft-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.desktop-draft-area .team-header {
+  padding: 22px 32px 18px;
+}
+.desktop-player-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px 32px 28px;
+}
+.desktop-player-card {
+  padding: 20px;
+  border-radius: 14px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-left: 5px solid var(--card-accent, var(--gold));
+  cursor: pointer;
+  animation: cardIn 0.3s ease;
+}
+.desktop-player-card.expanded {
+  background: var(--surface-strong);
+  border-color: rgba(242, 180, 65, 0.4);
+  border-left-color: var(--card-accent, var(--gold));
+}
+.desktop-player-card.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.desktop-player-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.desktop-player-identity {
+  flex: 1 1 160px;
+  min-width: 0;
+}
+.desktop-player-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.desktop-player-stats {
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.desktop-player-stats .score-box {
+  width: 74px;
+  flex-shrink: 0;
+}
+.desktop-draft-area .submit-bar {
+  margin-top: 0;
+  padding: 18px 32px 24px;
+  border-top: 1px solid var(--border);
+}
+
 /* ---------- Chase page ---------- */
+/* Fixed-shell layout: header + scoreboard pinned at top, controls pinned at
+ * bottom, only the ball-by-ball ticker scrolls in between. Overrides .page's
+ * natural document-flow height (min-height: 100vh, grows with content) with
+ * an actual bounded height + overflow: hidden, so .chase-layout's flex:1
+ * child has a real ceiling to size against instead of just growing forever. */
+.chase-page {
+  height: 100vh;
+  max-height: 900px;
+  overflow: hidden;
+}
 
 .chase-header {
+  flex-shrink: 0;
   margin-bottom: 14px;
 }
 .chase-title {
@@ -695,6 +938,7 @@
 }
 
 .scoreboard-panel {
+  flex-shrink: 0;
   padding: 20px;
   border-radius: 14px;
   background: var(--surface);
@@ -816,9 +1060,11 @@
 .ticker-panel {
   display: flex;
   flex-direction: column;
+  flex: 1;
   min-height: 0;
 }
 .ticker-heading {
+  flex-shrink: 0;
   font-family: var(--font-display);
   font-size: 13px;
   font-weight: 700;
@@ -830,8 +1076,7 @@
 .event-ticker {
   flex: 1;
   overflow-y: auto;
-  min-height: 200px;
-  max-height: 420px;
+  min-height: 0;
 }
 .event-row {
   display: flex;
@@ -891,6 +1136,7 @@
 }
 
 .chase-controls {
+  flex-shrink: 0;
   display: flex;
   gap: 10px;
   padding-top: 14px;

@@ -17,9 +17,9 @@ export function Home() {
 
   const onStart = async () => {
     setStarting(true);
-    await startSession();
+    const ok = await startSession();
     setStarting(false);
-    navigate('/build');
+    if (ok) navigate('/build');
   };
 
   return (

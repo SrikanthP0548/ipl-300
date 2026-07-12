@@ -1,14 +1,44 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGame } from '../GameContext';
 import { RoleBadge } from '../components/RoleBadge';
 import { ScoreReadout } from '../components/ScoreReadout';
+import { KeeperIcon, OverseasIcon } from '../components/PlayerIcons';
 import { isLineupComplete, validSlotsForPlayer } from '../draft';
 import type { Player, TeamSeason } from '../types';
+
+const MAX_OVERSEAS = 4;
+const DESKTOP_BREAKPOINT = '(min-width: 900px)';
+
+/** Style for the OS/WK count chips: teal while within the real-XI limit,
+ * red once it's been exceeded (overseas) or is still unmet (keeper). */
+function limitChipStyle(ok: boolean): CSSProperties {
+  return {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 5,
+    padding: '4px 9px',
+    borderRadius: 7,
+    fontFamily: 'var(--font-display)',
+    fontSize: 11.5,
+    fontWeight: 700,
+    letterSpacing: '0.3px',
+    color: ok ? 'var(--teal)' : '#FF6B6B',
+    background: ok ? 'rgba(34,211,198,0.1)' : 'rgba(255,77,77,0.12)',
+    border: '1px solid ' + (ok ? 'rgba(34,211,198,0.35)' : 'rgba(255,77,77,0.4)'),
+  };
+}
 
 // Accelerating-then-settling delay sequence for the "rolling the dice"
 // team-reveal effect — mirrors a slot machine winding down.
 const SPIN_DELAYS = [40, 45, 55, 65, 80, 95, 115, 140, 170, 205, 250, 310, 380];
+
+// Cycled by pool position (up to 15 team-seasons per draft) to give each
+// team-season a distinct accent color for the player card's left border.
+const TEAM_COLORS = ['#FFD23F', '#5B7FFF', '#22D3C6', '#A855F7', '#FF4D4D', '#FF3E9A'];
+function teamColor(poolIndex: number): string {
+  return TEAM_COLORS[poolIndex % TEAM_COLORS.length];
+}
 
 /** Purely cosmetic: flickers through team names before landing on the real
  * next team-season, so a new reveal always feels like a spin rather than
@@ -48,6 +78,24 @@ function useTeamSpin(pool: TeamSeason[] | undefined, targetIndex: number | null)
   return { spinning, spinTeam: pool && pool.length > 0 ? pool[spinIdx % pool.length] : null };
 }
 
+/** Tracks a media query so the page can switch between the mobile single-column
+ * layout and the desktop two-pane layout — these differ structurally (a vertical
+ * slot list with a detail overlay vs. horizontal slot chips, a wide player card
+ * vs. a stacked one), not just by CSS reflow, so this picks which JSX tree renders. */
+function useMediaQuery(query: string): boolean {
+  const [matches, setMatches] = useState(() => window.matchMedia(query).matches);
+
+  useEffect(() => {
+    const mql = window.matchMedia(query);
+    const onChange = () => setMatches(mql.matches);
+    onChange();
+    mql.addEventListener('change', onChange);
+    return () => mql.removeEventListener('change', onChange);
+  }, [query]);
+
+  return matches;
+}
+
 export function BuildXI() {
   const navigate = useNavigate();
   const {
@@ -69,6 +117,7 @@ export function BuildXI() {
 
   const [expandedPlayerId, setExpandedPlayerId] = useState<string | null>(null);
   const [detailSlot, setDetailSlot] = useState<number | null>(null);
+  const isDesktop = useMediaQuery(DESKTOP_BREAKPOINT);
 
   useEffect(() => {
     if (status === 'idle') navigate('/', { replace: true });
@@ -96,6 +145,14 @@ export function BuildXI() {
 
   const filledCount = Object.keys(draft.arrangement).length;
 
+  const assignedPlayers = Object.values(draft.arrangement)
+    .map((id) => allPlayersById.get(id)?.player)
+    .filter((p): p is Player => !!p);
+  const overseasCount = assignedPlayers.filter((p) => p.isOverseas).length;
+  const keeperCount = assignedPlayers.filter((p) => p.isKeeper).length;
+  const overseasOk = overseasCount <= MAX_OVERSEAS;
+  const keeperOk = keeperCount >= 1;
+
   const slots = Array.from({ length: 11 }, (_, i) => {
     const n = i + 1;
     const playerId = draft.arrangement[n];
@@ -107,6 +164,154 @@ export function BuildXI() {
     await submitCurrentLineup();
   };
 
+  const accent = teamColor(draft.teamPointer);
+
+  const limitChips = (
+    <>
+      <div style={limitChipStyle(overseasOk)}>
+        <OverseasIcon color={overseasOk ? 'var(--teal)' : '#FF6B6B'} size={13} />
+        <span>{overseasCount}/{MAX_OVERSEAS}</span>
+      </div>
+      <div style={limitChipStyle(keeperOk)}>
+        <KeeperIcon color={keeperOk ? 'var(--teal)' : '#FF6B6B'} size={13} />
+        <span>{keeperCount}/1</span>
+      </div>
+    </>
+  );
+
+  const spinBlock = !complete && spinning && (
+    <div className="spin-block">
+      <div className="spin-label">Finding next team…</div>
+      <div className="spin-team-name">{spinTeam ? `${spinTeam.franchise} · ${spinTeam.season}` : ''}</div>
+      <div className="spin-dots">
+        <span className="spin-dot gold" />
+        <span className="spin-dot teal" />
+        <span className="spin-dot red" />
+      </div>
+    </div>
+  );
+
+  const teamHeader = !complete && !spinning && currentTeam && (
+    <div className="team-header" style={{ ['--card-accent' as string]: accent }}>
+      <div className="team-banner">
+        <div className="team-banner-name">
+          {currentTeam.franchise} · {currentTeam.season}
+        </div>
+        <button className="skip-btn" onClick={skipCurrentTeam} disabled={!canSkipCurrentTeam}>
+          {canSkipCurrentTeam ? 'Skip Team →' : 'Skip Used'}
+        </button>
+      </div>
+      <div className="team-banner-hint">
+        {isDesktop ? 'Click a player to slot them in automatically, or skip this team.' : 'Tap a player to choose their position, or skip this team.'}
+      </div>
+    </div>
+  );
+
+  const completeBlock = complete && (
+    <div className="lineup-complete-block">
+      <div className="lineup-complete-title">XI Complete</div>
+      <div className="lineup-complete-desc">
+        All 11 slots are filled. Review your order {isDesktop ? 'on the left' : 'in the strip above'}, then submit your lineup.
+      </div>
+    </div>
+  );
+
+  const submitBar = (
+    <div className="submit-bar">
+      <button className="btn-primary submit-button" onClick={onSubmit} disabled={!complete || submitting}>
+        {submitting ? 'Simulating…' : complete ? 'Submit Lineup' : `Place All 11 (${filledCount}/11)`}
+      </button>
+    </div>
+  );
+
+  if (isDesktop) {
+    return (
+      <div className="page buildxi-page-desktop">
+        <div className="desktop-topbar">
+          <div className="desktop-topbar-title">
+            IPL<span className="wordmark-accent">-300</span>
+            <span className="desktop-topbar-subtitle">Build Your XI</span>
+          </div>
+          <button className="toggle-scores-btn" onClick={toggleScores} style={{ color: scoresVisible ? 'var(--teal)' : 'var(--text-muted)' }}>
+            {scoresVisible ? 'Scores: On' : 'Scores: Off'}
+          </button>
+        </div>
+
+        <div className="desktop-body">
+          <div className="desktop-rail">
+            <div className="desktop-rail-header">
+              <div className="section-label">
+                Selected Team XI <span className="accent-teal">{filledCount}/11</span>
+              </div>
+              <div className="header-chip-row">{limitChips}</div>
+            </div>
+
+            <div className="desktop-slot-list">
+              {slots.map(({ n, occupant }) => (
+                <div
+                  key={n}
+                  className={detailSlot === n && occupant ? 'desktop-slot-row selected' : 'desktop-slot-row'}
+                  onClick={() => occupant && setDetailSlot((s) => (s === n ? null : n))}
+                >
+                  <span className="desktop-slot-n">{n}</span>
+                  <span
+                    className="desktop-slot-dot"
+                    style={occupant ? { background: teamColor(occupant.teamIndex), boxShadow: `0 0 8px ${teamColor(occupant.teamIndex)}` } : undefined}
+                  />
+                  <span className={occupant ? 'desktop-slot-name filled' : 'desktop-slot-name'}>
+                    {occupant ? occupant.player.name : 'Empty'}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            {error && <div className="home-error">{error}</div>}
+
+            {detailSlot != null && slots[detailSlot - 1]?.occupant && (
+              <>
+                <div className="detail-scrim" onClick={() => setDetailSlot(null)} />
+                <PlayerDetailCard
+                  entry={slots[detailSlot - 1].occupant!}
+                  scoresVisible={scoresVisible}
+                  onClose={() => setDetailSlot(null)}
+                  className="desktop-detail-popup"
+                />
+              </>
+            )}
+          </div>
+
+          <div className="desktop-draft-area">
+            {spinBlock}
+            {teamHeader}
+
+            {!complete && !spinning && currentTeam && (
+              <div className="desktop-player-list">
+                {currentTeam.players.map((p) => (
+                  <DesktopPlayerCard
+                    key={p.id}
+                    player={p}
+                    accent={accent}
+                    arrangement={draft.arrangement}
+                    scoresVisible={scoresVisible}
+                    expanded={expandedPlayerId === p.id}
+                    onToggle={() => setExpandedPlayerId((id) => (id === p.id ? null : p.id))}
+                    onPick={(slot) => {
+                      pickPlayer(currentTeam.id, p, slot);
+                      setExpandedPlayerId(null);
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+
+            {completeBlock}
+            {submitBar}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="page buildxi-page">
       <div className="buildxi-header">
@@ -117,9 +322,12 @@ export function BuildXI() {
           <div className="section-label">
             Selected Team XI <span className="accent-teal">{filledCount}/11</span>
           </div>
-          <button className="toggle-scores-btn" onClick={toggleScores} style={{ color: scoresVisible ? 'var(--teal)' : 'var(--text-muted)' }}>
-            {scoresVisible ? 'Scores: On' : 'Scores: Off'}
-          </button>
+          <div className="header-chip-row">
+            {limitChips}
+            <button className="toggle-scores-btn" onClick={toggleScores} style={{ color: scoresVisible ? 'var(--teal)' : 'var(--text-muted)' }}>
+              {scoresVisible ? 'Scores: On' : 'Scores: Off'}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -142,98 +350,134 @@ export function BuildXI() {
 
       {error && <div className="home-error">{error}</div>}
 
-      {!complete && spinning && (
-        <div className="spin-block">
-          <div className="spin-label">Finding next team…</div>
-          <div className="spin-team-name">{spinTeam ? `${spinTeam.franchise} · ${spinTeam.season}` : ''}</div>
-          <div className="spin-dots">
-            <span className="spin-dot gold" />
-            <span className="spin-dot teal" />
-            <span className="spin-dot red" />
-          </div>
-        </div>
-      )}
+      {spinBlock}
+      {teamHeader}
 
       {!complete && !spinning && currentTeam && (
-        <>
-          <div className="team-banner">
-            <div className="team-banner-name">
-              {currentTeam.franchise} · {currentTeam.season}
-            </div>
-            <button className="skip-btn" onClick={skipCurrentTeam} disabled={!canSkipCurrentTeam}>
-              Skip Team →
-            </button>
-          </div>
-          <div className="team-banner-hint">
-            {canSkipCurrentTeam ? 'Tap a player to choose their position, or skip this team.' : 'Tap a player to choose their position. No skips left.'}
-          </div>
-
-          <div className="player-list">
-            {currentTeam.players.map((p) => {
-              const validSlots = validSlotsForPlayer(p, draft.arrangement);
-              const pickable = validSlots.length > 0;
-              const expanded = expandedPlayerId === p.id;
-              return (
-                <div
-                  key={p.id}
-                  className={`player-card${expanded ? ' expanded' : ''}${!pickable ? ' disabled' : ''}`}
-                  onClick={() => pickable && setExpandedPlayerId((id) => (id === p.id ? null : p.id))}
-                >
-                  <div className="player-card-top">
+        <div className="player-list" style={{ ['--card-accent' as string]: accent }}>
+          {currentTeam.players.map((p) => {
+            const validSlots = validSlotsForPlayer(p, draft.arrangement);
+            const pickable = validSlots.length > 0;
+            const expanded = expandedPlayerId === p.id;
+            return (
+              <div
+                key={p.id}
+                className={`player-card${expanded ? ' expanded' : ''}${!pickable ? ' disabled' : ''}`}
+                onClick={() => pickable && setExpandedPlayerId((id) => (id === p.id ? null : p.id))}
+              >
+                <div className="player-card-top">
+                  <div className="player-name-row">
                     <div className="player-name">{p.name}</div>
-                    <div className="player-meta">
-                      <RoleBadge role={p.roleBadge} />
-                      <span className="range-label">
-                        SLOT {p.minPos === p.maxPos ? p.minPos : `${p.minPos}-${p.maxPos}`}
-                      </span>
-                    </div>
+                    {p.isKeeper && <KeeperIcon color={accent} />}
+                    {p.isOverseas && <OverseasIcon color={accent} />}
                   </div>
-                  <div className="player-stats">
-                    <ScoreReadout label="Batting" value={p.battingScore} hidden={!scoresVisible} />
-                    <ScoreReadout label="Finishing" value={p.finishingScore} hidden={!scoresVisible} />
-                    <ScoreReadout label="Bowling" value={p.bowlingScore} hidden={!scoresVisible} />
+                  <div className="player-meta">
+                    <RoleBadge role={p.roleBadge} />
+                    <span className="range-label">
+                      SLOT {p.minPos === p.maxPos ? p.minPos : `${p.minPos}-${p.maxPos}`}
+                    </span>
                   </div>
-                  {expanded && pickable && (
-                    <div className="position-picker">
-                      <div className="position-picker-label">Choose a position</div>
-                      <div className="position-chip-row">
-                        {validSlots.map((slot) => (
-                          <button
-                            key={slot}
-                            className="position-chip"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              pickPlayer(currentTeam.id, p, slot);
-                              setExpandedPlayerId(null);
-                            }}
-                          >
-                            {slot}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
                 </div>
-              );
-            })}
-          </div>
-        </>
-      )}
-
-      {complete && (
-        <div className="lineup-complete-block">
-          <div className="lineup-complete-title">XI Complete</div>
-          <div className="lineup-complete-desc">
-            All 11 slots are filled. Review your order in the strip above, then submit your lineup.
-          </div>
+                <div className="player-stats">
+                  <ScoreReadout label="Batting" value={p.battingScore} hidden={!scoresVisible} />
+                  <ScoreReadout label="Finishing" value={p.finishingScore} hidden={!scoresVisible} />
+                  <ScoreReadout label="Bowling" value={p.bowlingScore} hidden={!scoresVisible} />
+                </div>
+                {expanded && pickable && (
+                  <div className="position-picker">
+                    <div className="position-picker-label">Choose a position</div>
+                    <div className="position-chip-row">
+                      {validSlots.map((slot) => (
+                        <button
+                          key={slot}
+                          className="position-chip"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            pickPlayer(currentTeam.id, p, slot);
+                            setExpandedPlayerId(null);
+                          }}
+                        >
+                          {slot}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
 
-      <div className="submit-bar">
-        <button className="btn-primary submit-button" onClick={onSubmit} disabled={!complete || submitting}>
-          {submitting ? 'Simulating…' : complete ? 'Submit Lineup' : `Place All 11 (${filledCount}/11)`}
-        </button>
+      {completeBlock}
+      {submitBar}
+    </div>
+  );
+}
+
+function DesktopPlayerCard({
+  player: p,
+  accent,
+  arrangement,
+  scoresVisible,
+  expanded,
+  onToggle,
+  onPick,
+}: {
+  player: Player;
+  accent: string;
+  arrangement: Record<number, string>;
+  scoresVisible: boolean;
+  expanded: boolean;
+  onToggle: () => void;
+  onPick: (slot: number) => void;
+}) {
+  const validSlots = validSlotsForPlayer(p, arrangement);
+  const pickable = validSlots.length > 0;
+
+  return (
+    <div
+      className={`desktop-player-card${expanded ? ' expanded' : ''}${!pickable ? ' disabled' : ''}`}
+      style={{ ['--card-accent' as string]: accent }}
+      onClick={() => pickable && onToggle()}
+    >
+      <div className="desktop-player-row">
+        <div className="desktop-player-identity">
+          <div className="player-name-row">
+            <div className="desktop-player-name">{p.name}</div>
+            {p.isKeeper && <KeeperIcon color={accent} />}
+            {p.isOverseas && <OverseasIcon color={accent} />}
+          </div>
+          <div className="player-meta">
+            <RoleBadge role={p.roleBadge} />
+            <span className="range-label">BEST SLOT {p.minPos === p.maxPos ? p.minPos : `${p.minPos}-${p.maxPos}`}</span>
+          </div>
+        </div>
+        <div className="desktop-player-stats">
+          <ScoreReadout label="Batting" value={p.battingScore} hidden={!scoresVisible} />
+          <ScoreReadout label="Finishing" value={p.finishingScore} hidden={!scoresVisible} />
+          <ScoreReadout label="Bowling" value={p.bowlingScore} hidden={!scoresVisible} />
+        </div>
       </div>
+      {expanded && pickable && (
+        <div className="position-picker">
+          <div className="position-picker-label">Choose a position</div>
+          <div className="position-chip-row">
+            {validSlots.map((slot) => (
+              <button
+                key={slot}
+                className="position-chip"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onPick(slot);
+                }}
+              >
+                {slot}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -242,14 +486,16 @@ function PlayerDetailCard({
   entry,
   scoresVisible,
   onClose,
+  className,
 }: {
   entry: { player: Player; franchise: string; season: number };
   scoresVisible: boolean;
   onClose: () => void;
+  className?: string;
 }) {
   const { player, franchise, season } = entry;
   return (
-    <div className="detail-card">
+    <div className={className ? `detail-card ${className}` : 'detail-card'}>
       <div className="detail-card-top">
         <div>
           <div className="player-name">{player.name}</div>

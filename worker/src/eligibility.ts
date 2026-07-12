@@ -1,17 +1,27 @@
 import type { Player } from './types';
 
 /**
- * First-pass thresholds carried over from the earlier fixed-XI calibration
- * (top-7 batting/finishing averages, bottom-4 bowling depth, keeper, bowler
- * count). The draft mechanic — pick the single best-fitting player per slot
- * out of up to 15 team-seasons — gives far more optimization power than a
- * fixed historical XI ever had, so these will very likely need re-tuning
- * once we can playtest real drafted lineups. Treat as tunable constants.
+ * Recalibrated against the Release 1B scoring model (era-normalized global
+ * percentile, see scripts/build_csv.py). The draft mechanic - pick the best
+ * legally-fitting player per slot out of a 15-team-season pool - is powerful
+ * enough that even a naive greedy draft strategy reliably assembles a team
+ * near the top of the score distribution (simulated 6000 greedy drafts
+ * against the live game_data.json: top-7 batting/finishing and bottom-4
+ * bowling averages cluster tightly in the low-mid 80s to low 90s, p10-p90).
+ *
+ * Because these three metrics are correlated but not identical, requiring
+ * all three simultaneously is considerably more selective than any single
+ * one of them alone - setting each to its own individual p75 mark compounds
+ * to a ~2.4% joint pass rate, not 25%. The target here is a ~10-12% joint
+ * pass rate (eligibility should be a real accomplishment, not the default
+ * outcome, but not vanishingly rare either), which the same simulation
+ * shows corresponds to each threshold sitting at its own individual ~p55
+ * mark (p50 -> 14.3% joint, p55 -> 11.0% joint, p58 -> 9.3% joint).
  */
 export const THRESHOLDS = {
-  TOP_BATTING_AVG: 60,
-  TOP_FINISHING_AVG: 62,
-  BOTTOM_BOWLING_AVG: 48,
+  TOP_BATTING_AVG: 85.5,
+  TOP_FINISHING_AVG: 88.2,
+  BOTTOM_BOWLING_AVG: 88.2,
   REAL_BOWLER_MIN_SCORE: 40,
   MIN_REAL_BOWLERS: 3,
 };
@@ -90,8 +100,12 @@ export const WIN_LOTTERY_RATE = 0.7;
 export function pickBand(elig: EligibilityResult, won: boolean): BandResult {
   if (elig.eligible) {
     if (won) return { reason: 'win', targetMin: 301, targetMax: 999 };
-    const reason: ReasonCode = Math.random() < 0.5 ? 'blowup' : 'choke';
-    return { reason, targetMin: 275, targetMax: 299 };
+    // Split of the 30% non-win share: 20% blowup (a bigger, uglier collapse -
+    // matches its copy in app/src/copy.ts, "the middle order fell apart"),
+    // 10% choke (a razor-thin miss - matches its copy, "margin was razor
+    // thin"). 2/3 vs 1/3 of the non-win branch reproduces 20%/10% exactly.
+    if (Math.random() < 2 / 3) return { reason: 'blowup', targetMin: 280, targetMax: 290 };
+    return { reason: 'choke', targetMin: 291, targetMax: 299 };
   }
   if (elig.structural) {
     return { reason: 'structurally_broken', targetMin: 60, targetMax: 129 };
