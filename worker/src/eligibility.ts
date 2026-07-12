@@ -100,8 +100,12 @@ export const WIN_LOTTERY_RATE = 0.7;
 export function pickBand(elig: EligibilityResult, won: boolean): BandResult {
   if (elig.eligible) {
     if (won) return { reason: 'win', targetMin: 301, targetMax: 999 };
-    const reason: ReasonCode = Math.random() < 0.5 ? 'blowup' : 'choke';
-    return { reason, targetMin: 275, targetMax: 299 };
+    // Split of the 30% non-win share: 20% blowup (a bigger, uglier collapse -
+    // matches its copy in app/src/copy.ts, "the middle order fell apart"),
+    // 10% choke (a razor-thin miss - matches its copy, "margin was razor
+    // thin"). 2/3 vs 1/3 of the non-win branch reproduces 20%/10% exactly.
+    if (Math.random() < 2 / 3) return { reason: 'blowup', targetMin: 280, targetMax: 290 };
+    return { reason: 'choke', targetMin: 291, targetMax: 299 };
   }
   if (elig.structural) {
     return { reason: 'structurally_broken', targetMin: 60, targetMax: 129 };
