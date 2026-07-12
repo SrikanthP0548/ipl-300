@@ -9,11 +9,9 @@ interface DraftState {
   poolToken: string;
   teamPointer: number;
   resolvedTeamIds: Set<string>;
-  skipsUsed: number;
+  skippedTeamIds: Set<string>;
   arrangement: Record<number, string>; // slot -> playerId
 }
-
-const MAX_SKIPS = 1;
 
 interface GameContextValue {
   scoresVisible: boolean;
@@ -33,7 +31,7 @@ interface GameContextValue {
   submitCurrentLineup: () => Promise<void>;
   currentTeam: TeamSeason | null;
   canSkipCurrentTeam: boolean;
-  allPlayersById: Map<string, { player: Player; teamSeasonId: string; franchise: string; season: number }>;
+  allPlayersById: Map<string, { player: Player; teamSeasonId: string; teamIndex: number; franchise: string; season: number }>;
 }
 
 const GameContext = createContext<GameContextValue | null>(null);
@@ -60,7 +58,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         poolToken: res.poolToken,
         teamPointer: 0,
         resolvedTeamIds: new Set(),
-        skipsUsed: 0,
+        skippedTeamIds: new Set(),
         arrangement: {},
       });
       setStatus('ready');
@@ -112,30 +110,37 @@ export function GameProvider({ children }: { children: ReactNode }) {
       if (d.arrangement[slot]) return d;
       const resolved = new Set(d.resolvedTeamIds);
       resolved.add(teamSeasonId);
+      const skipped = new Set(d.skippedTeamIds);
+      skipped.delete(teamSeasonId);
       const arrangement = { ...d.arrangement, [slot]: player.id };
       const next = findNextTeamIndex(d.pool, resolved, 0);
       return {
         ...d,
         arrangement,
         resolvedTeamIds: resolved,
+        skippedTeamIds: skipped,
         teamPointer: next ?? d.teamPointer,
       };
     });
   }, []);
 
+  // Each team-season may be skipped once (not a draft-wide budget) - the
+  // button just guards against double-firing on the same team, since
+  // findNextTeamIndex never revisits a resolved team in normal flow.
   const skipCurrentTeam = useCallback(() => {
     setDraft((d) => {
       if (!d) return d;
-      if (d.skipsUsed >= MAX_SKIPS) return d;
       const team = d.pool[d.teamPointer];
-      if (!team) return d;
+      if (!team || d.skippedTeamIds.has(team.id)) return d;
       const resolved = new Set(d.resolvedTeamIds);
       resolved.add(team.id);
+      const skipped = new Set(d.skippedTeamIds);
+      skipped.add(team.id);
       const next = findNextTeamIndex(d.pool, resolved, 0);
       return {
         ...d,
         resolvedTeamIds: resolved,
-        skipsUsed: d.skipsUsed + 1,
+        skippedTeamIds: skipped,
         teamPointer: next ?? d.teamPointer,
       };
     });
@@ -158,14 +163,14 @@ export function GameProvider({ children }: { children: ReactNode }) {
   }, [draft]);
 
   const currentTeam = draft && draft.teamPointer < draft.pool.length ? draft.pool[draft.teamPointer] : null;
-  const canSkipCurrentTeam = !!draft && draft.skipsUsed < MAX_SKIPS;
+  const canSkipCurrentTeam = !!draft && !!currentTeam && !draft.skippedTeamIds.has(currentTeam.id);
 
   const allPlayersById = useMemo(() => {
-    const map = new Map<string, { player: Player; teamSeasonId: string; franchise: string; season: number }>();
+    const map = new Map<string, { player: Player; teamSeasonId: string; teamIndex: number; franchise: string; season: number }>();
     if (draft) {
-      for (const t of draft.pool) {
-        for (const p of t.players) map.set(p.id, { player: p, teamSeasonId: t.id, franchise: t.franchise, season: t.season });
-      }
+      draft.pool.forEach((t, teamIndex) => {
+        for (const p of t.players) map.set(p.id, { player: p, teamSeasonId: t.id, teamIndex, franchise: t.franchise, season: t.season });
+      });
     }
     return map;
   }, [draft]);

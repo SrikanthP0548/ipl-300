@@ -95,6 +95,7 @@ def build():
                 'minPos': p['minPos'],
                 'maxPos': p['maxPos'],
                 'isKeeper': p['isKeeper'],
+                'isOverseas': p.get('isOverseas', False),
                 'battingScore': p.get('BattingPower'),
                 'finishingScore': p.get('FinishingPower'),
                 'bowlingScore': p.get('BowlingScore'),

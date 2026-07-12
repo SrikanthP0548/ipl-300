@@ -364,7 +364,15 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 10px;
   margin-top: 16px;
+  flex-wrap: wrap;
+}
+.header-chip-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 .toggle-scores-btn {
   border: 1px solid var(--border-strong);
@@ -381,8 +389,8 @@
 
 .slot-strip {
   display: flex;
+  flex-wrap: wrap;
   gap: 7px;
-  overflow-x: auto;
   padding: 10px 0 12px;
   border-bottom: 1px solid var(--border);
   margin-bottom: 12px;
@@ -565,7 +573,10 @@
   box-shadow: 0 0 12px color-mix(in srgb, var(--card-accent, var(--gold)) 19%, transparent);
 }
 .skip-btn:disabled {
-  opacity: 0.4;
+  border-color: var(--border);
+  background: var(--surface);
+  color: var(--text-disabled);
+  box-shadow: none;
   cursor: not-allowed;
 }
 
@@ -589,6 +600,11 @@
 }
 .player-card .player-name {
   font-size: 14.5px;
+}
+.player-name-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 .player-name {
   font-size: 16px;
@@ -692,6 +708,186 @@
 }
 .submit-button {
   width: 100%;
+}
+
+/* ---------- Build XI: desktop two-pane layout ---------- */
+
+.buildxi-page-desktop {
+  padding: 0;
+  height: calc(100vh - 48px);
+  max-height: 900px;
+}
+.desktop-topbar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28px 40px;
+  border-bottom: 1px solid var(--border);
+}
+.desktop-topbar-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 28px;
+  letter-spacing: -0.5px;
+  color: var(--text-primary);
+}
+.desktop-topbar-subtitle {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  margin-left: 14px;
+  text-transform: uppercase;
+}
+.desktop-body {
+  position: relative;
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+.desktop-rail {
+  position: relative;
+  width: 320px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--border);
+  padding: 24px;
+  overflow-y: auto;
+}
+.desktop-rail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.desktop-slot-list {
+  display: flex;
+  flex-direction: column;
+}
+.desktop-slot-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 6px;
+  border-radius: 8px;
+  border-bottom: 1px solid var(--border);
+  animation: slotPop 0.25s ease;
+}
+.desktop-slot-row.selected {
+  background: rgba(34, 211, 198, 0.12);
+}
+.desktop-slot-n {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-faint);
+  width: 18px;
+  flex-shrink: 0;
+}
+.desktop-slot-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--border-strong);
+}
+.desktop-slot-name {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-disabled);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.desktop-slot-name.filled {
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+.detail-scrim {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 6, 14, 0.6);
+  z-index: 40;
+  backdrop-filter: blur(2px);
+}
+.detail-card.desktop-detail-popup {
+  position: absolute;
+  left: 24px;
+  right: 24px;
+  top: 120px;
+  z-index: 41;
+  box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.65);
+}
+.desktop-draft-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.desktop-draft-area .team-header {
+  padding: 22px 32px 18px;
+}
+.desktop-player-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px 32px 28px;
+}
+.desktop-player-card {
+  padding: 20px;
+  border-radius: 14px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-left: 5px solid var(--card-accent, var(--gold));
+  cursor: pointer;
+  animation: cardIn 0.3s ease;
+}
+.desktop-player-card.expanded {
+  background: var(--surface-strong);
+  border-color: rgba(242, 180, 65, 0.4);
+  border-left-color: var(--card-accent, var(--gold));
+}
+.desktop-player-card.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.desktop-player-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.desktop-player-identity {
+  flex: 1 1 160px;
+  min-width: 0;
+}
+.desktop-player-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.desktop-player-stats {
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.desktop-player-stats .score-box {
+  width: 74px;
+  flex-shrink: 0;
+}
+.desktop-draft-area .submit-bar {
+  margin-top: 0;
+  padding: 18px 32px 24px;
+  border-top: 1px solid var(--border);
 }
 
 /* ---------- Chase page ---------- */

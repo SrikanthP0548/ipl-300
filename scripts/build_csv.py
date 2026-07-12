@@ -1,8 +1,15 @@
-import re, csv, bisect, statistics
+import json, re, csv, bisect, statistics
 from collections import defaultdict
 from pathlib import Path
 
 REPO = Path("/home/user/ipl-300")
+
+# name|team|season -> is this player-season an overseas signing? Sourced from
+# a reference dataset with real nationality data (95.1% direct match); the
+# remainder (mostly small-sample player-seasons excluded from that reference
+# entirely) were classified by hand.
+with open(Path(__file__).resolve().parent / "overseas_lookup.json") as _f:
+    OVERSEAS_LOOKUP = json.load(_f)
 
 FILES = {
     2008: "ipl_2008_team_best_xi.md",
@@ -334,6 +341,7 @@ def compute_all_players():
         rec['_bowl'] = bm
         rec['role_category'] = classify_role(rec['role'])
         rec['_is_spin'] = 'spin' in (rec.get('role') or '').lower()
+        rec['isOverseas'] = OVERSEAS_LOOKUP.get(f"{rec['name']}|{rec['team']}|{rec['season']}", False)
         # Some season files carry Econ but not a raw runs-conceded column at
         # all (2018 and 2026 are 100% missing it). Reconstruct it exactly
         # (Econ is defined as runs/(balls/6)) rather than let it silently

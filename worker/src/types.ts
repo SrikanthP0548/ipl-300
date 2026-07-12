@@ -8,6 +8,7 @@ export interface Player {
   minPos: number;
   maxPos: number;
   isKeeper: boolean;
+  isOverseas: boolean;
   battingScore: number | null;
   finishingScore: number | null;
   bowlingScore: number | null;

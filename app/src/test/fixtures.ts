@@ -12,6 +12,7 @@ export function player(overrides: Partial<Player> = {}): Player {
     minPos: overrides.minPos ?? 1,
     maxPos: overrides.maxPos ?? 3,
     isKeeper: overrides.isKeeper ?? false,
+    isOverseas: overrides.isOverseas ?? false,
     battingScore: overrides.battingScore ?? 88,
     finishingScore: overrides.finishingScore ?? 72,
     bowlingScore: overrides.bowlingScore ?? null,
