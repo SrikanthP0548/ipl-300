@@ -1,17 +1,25 @@
 import type { Player } from './types';
 
 /**
- * First-pass thresholds carried over from the earlier fixed-XI calibration
- * (top-7 batting/finishing averages, bottom-4 bowling depth, keeper, bowler
- * count). The draft mechanic — pick the single best-fitting player per slot
- * out of up to 15 team-seasons — gives far more optimization power than a
- * fixed historical XI ever had, so these will very likely need re-tuning
- * once we can playtest real drafted lineups. Treat as tunable constants.
+ * Recalibrated against the Release 1B scoring model (era-normalized global
+ * percentile, see scripts/build_csv.py). The draft mechanic - pick the best
+ * legally-fitting player per slot out of a 15-team-season pool - is powerful
+ * enough that even a naive greedy draft strategy reliably assembles a team
+ * near the top of the score distribution (simulated 4000 greedy drafts
+ * against the live game_data.json: top-7 batting/finishing and bottom-4
+ * bowling averages cluster tightly in the low-mid 80s to low 90s, p10-p90).
+ * These three averages are set to that simulation's p75 mark individually.
+ * Because the metrics are correlated but not identical, requiring all three
+ * simultaneously is considerably more selective than 75% on its own -
+ * empirically about 2.4% of simulated drafts clear all three at once (down
+ * from ~87% under the old thresholds against this same scoring model) -
+ * which is the intended effect: chasing 301 should be a rare, earned outcome,
+ * not something most competent drafts stumble into via the flat win lottery.
  */
 export const THRESHOLDS = {
-  TOP_BATTING_AVG: 60,
-  TOP_FINISHING_AVG: 62,
-  BOTTOM_BOWLING_AVG: 48,
+  TOP_BATTING_AVG: 86.9,
+  TOP_FINISHING_AVG: 89.5,
+  BOTTOM_BOWLING_AVG: 90.3,
   REAL_BOWLER_MIN_SCORE: 40,
   MIN_REAL_BOWLERS: 3,
 };
