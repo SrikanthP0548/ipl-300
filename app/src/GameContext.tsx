@@ -26,7 +26,7 @@ interface GameContextValue {
   result: ResultResponse | null;
   submitting: boolean;
 
-  startSession: () => Promise<void>;
+  startSession: () => Promise<boolean>;
   advanceIfDead: () => void;
   pickPlayer: (teamSeasonId: string, player: Player, slot: number) => void;
   skipCurrentTeam: () => void;
@@ -48,7 +48,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
   const toggleScores = useCallback(() => setScoresVisible((v) => !v), []);
 
-  const startSession = useCallback(async () => {
+  const startSession = useCallback(async (): Promise<boolean> => {
     setStatus('loading');
     setError(null);
     setResult(null);
@@ -64,9 +64,11 @@ export function GameProvider({ children }: { children: ReactNode }) {
         arrangement: {},
       });
       setStatus('ready');
+      return true;
     } catch (e) {
       setError(e instanceof Error ? e.message : 'failed to load squads');
       setStatus('error');
+      return false;
     }
   }, []);
 
