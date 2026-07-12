@@ -426,14 +426,14 @@
 
 .detail-card,
 .player-card {
-  padding: 16px;
   border-radius: 12px;
   background: var(--surface);
   border: 1.5px solid var(--border);
-  margin-bottom: 12px;
   animation: cardIn 0.3s ease;
 }
 .detail-card {
+  padding: 16px;
+  margin-bottom: 12px;
   border-color: var(--border-strong);
 }
 .detail-card-top,
@@ -562,11 +562,22 @@
   padding-bottom: 12px;
 }
 .player-card {
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  border-left: 3px solid var(--card-accent, var(--gold));
   cursor: pointer;
+}
+.player-card.expanded {
+  background: var(--surface-strong);
+  border-color: rgba(242, 180, 65, 0.4);
+  border-left-color: var(--card-accent, var(--gold));
 }
 .player-card.disabled {
   opacity: 0.4;
   cursor: not-allowed;
+}
+.player-card .player-name {
+  font-size: 14.5px;
 }
 .player-name {
   font-size: 16px;
@@ -576,21 +587,35 @@
 .player-meta {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   margin-top: 6px;
 }
 .range-label {
   font-family: var(--font-display);
-  font-size: 12px;
+  font-size: 10.5px;
   font-weight: 700;
   color: var(--text-faint);
   letter-spacing: 0.5px;
+  white-space: nowrap;
 }
 .player-stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 10px;
   margin-top: 14px;
+}
+.player-card .player-stats {
+  gap: 6px;
+  margin-top: 8px;
+}
+.player-card .score-box {
+  padding: 5px 6px;
+}
+.player-card .score-label {
+  font-size: 8.5px;
+}
+.player-card .score-value {
+  font-size: 16px;
 }
 
 .position-picker {

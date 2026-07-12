@@ -10,6 +10,13 @@ import type { Player, TeamSeason } from '../types';
 // team-reveal effect — mirrors a slot machine winding down.
 const SPIN_DELAYS = [40, 45, 55, 65, 80, 95, 115, 140, 170, 205, 250, 310, 380];
 
+// Cycled by pool position (up to 15 team-seasons per draft) to give each
+// team-season a distinct accent color for the player card's left border.
+const TEAM_COLORS = ['#FFD23F', '#5B7FFF', '#22D3C6', '#A855F7', '#FF4D4D', '#FF3E9A'];
+function teamColor(poolIndex: number): string {
+  return TEAM_COLORS[poolIndex % TEAM_COLORS.length];
+}
+
 /** Purely cosmetic: flickers through team names before landing on the real
  * next team-season, so a new reveal always feels like a spin rather than
  * an instant swap. Doesn't affect which team is actually shown next —
@@ -168,7 +175,7 @@ export function BuildXI() {
             {canSkipCurrentTeam ? 'Tap a player to choose their position, or skip this team.' : 'Tap a player to choose their position. No skips left.'}
           </div>
 
-          <div className="player-list">
+          <div className="player-list" style={{ ['--card-accent' as string]: teamColor(draft.teamPointer) }}>
             {currentTeam.players.map((p) => {
               const validSlots = validSlotsForPlayer(p, draft.arrangement);
               const pickable = validSlots.length > 0;
