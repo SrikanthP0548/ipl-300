@@ -51,4 +51,58 @@ describe('draft helpers', () => {
       }),
     ).toBe(true);
   });
+
+  it('blocks an overseas player once the real-XI cap (4) is already reached', () => {
+    const overseasPick = player({ id: 'overseas-5', isOverseas: true, minPos: 1, maxPos: 11 });
+    const fourOverseasAlready = [
+      player({ id: 'o1', isOverseas: true }),
+      player({ id: 'o2', isOverseas: true }),
+      player({ id: 'o3', isOverseas: true }),
+      player({ id: 'o4', isOverseas: true }),
+    ];
+
+    expect(validSlotsForPlayer(overseasPick, { 1: 'x' }, { assignedPlayers: fourOverseasAlready })).toEqual([]);
+    expect(
+      validSlotsForPlayer(overseasPick, { 1: 'x' }, { assignedPlayers: fourOverseasAlready.slice(0, 3) }),
+    ).not.toEqual([]);
+  });
+
+  it('does not cap domestic players and has no overseas minimum', () => {
+    const domesticPick = player({ id: 'domestic', isOverseas: false, minPos: 1, maxPos: 11 });
+    const fourOverseasAlready = [
+      player({ id: 'o1', isOverseas: true }),
+      player({ id: 'o2', isOverseas: true }),
+      player({ id: 'o3', isOverseas: true }),
+      player({ id: 'o4', isOverseas: true }),
+    ];
+
+    expect(validSlotsForPlayer(domesticPick, { 1: 'x' }, { assignedPlayers: fourOverseasAlready })).not.toEqual([]);
+  });
+
+  it('blocks a non-keeper from taking the last open slot when no keeper has been picked yet', () => {
+    const nonKeeper = player({ id: 'batter', isKeeper: false, minPos: 1, maxPos: 11 });
+    const keeper = player({ id: 'keeper', isKeeper: true, minPos: 1, maxPos: 11 });
+    const arrangement: Record<number, string> = {};
+    for (let s = 1; s <= 10; s++) arrangement[s] = `p${s}`;
+
+    expect(validSlotsForPlayer(nonKeeper, arrangement, { assignedPlayers: [] })).toEqual([]);
+    expect(validSlotsForPlayer(keeper, arrangement, { assignedPlayers: [] })).toEqual([11]);
+  });
+
+  it('lets a non-keeper take any non-final slot even with zero keepers picked so far', () => {
+    const nonKeeper = player({ id: 'batter', isKeeper: false, minPos: 1, maxPos: 5 });
+    const arrangement = { 1: 'p1' };
+
+    expect(validSlotsForPlayer(nonKeeper, arrangement, { assignedPlayers: [] })).toEqual([2, 3, 4, 5]);
+  });
+
+  it('requires a keeper among the assigned players for the lineup to count as complete', () => {
+    const arrangement: Record<number, string> = {};
+    for (let s = 1; s <= 11; s++) arrangement[s] = `p${s}`;
+    const noKeeperRoster = Array.from({ length: 11 }, (_, i) => player({ id: `p${i}`, isKeeper: false }));
+    const withKeeperRoster = [...noKeeperRoster.slice(0, 10), player({ id: 'p10', isKeeper: true })];
+
+    expect(isLineupComplete(arrangement, { assignedPlayers: noKeeperRoster })).toBe(false);
+    expect(isLineupComplete(arrangement, { assignedPlayers: withKeeperRoster })).toBe(true);
+  });
 });

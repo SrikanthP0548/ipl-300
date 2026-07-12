@@ -1,6 +1,7 @@
 import type { Player, TeamSeason } from './types';
 
 export const TOTAL_SLOTS = 11;
+export const MAX_OVERSEAS = 4;
 
 export function openSlots(arrangement: Record<number, string>): number[] {
   const slots: number[] = [];
@@ -10,16 +11,44 @@ export function openSlots(arrangement: Record<number, string>): number[] {
   return slots;
 }
 
-export function validSlotsForPlayer(player: Player, arrangement: Record<number, string>): number[] {
-  return openSlots(arrangement).filter((s) => s >= player.minPos && s <= player.maxPos);
+/** Roster-composition context needed to enforce the overseas cap and the
+ * keeper requirement. Optional everywhere it's threaded through - omitting
+ * it (e.g. in pure slot-range unit tests) just skips those two checks. */
+export interface RosterContext {
+  assignedPlayers: Player[];
 }
 
-export function isPlayerPickable(player: Player, arrangement: Record<number, string>): boolean {
-  return validSlotsForPlayer(player, arrangement).length > 0;
+export function validSlotsForPlayer(
+  player: Player,
+  arrangement: Record<number, string>,
+  context?: RosterContext,
+): number[] {
+  const open = openSlots(arrangement).filter((s) => s >= player.minPos && s <= player.maxPos);
+  if (open.length === 0 || !context) return open;
+
+  const { assignedPlayers } = context;
+
+  // Real-XI rule: at most 4 overseas players. A cap, not a minimum - 0-4 is fine.
+  if (player.isOverseas && assignedPlayers.filter((p) => p.isOverseas).length >= MAX_OVERSEAS) {
+    return [];
+  }
+
+  // Real-XI rule: at least 1 keeper. If none picked yet and this is the only
+  // slot left open, a non-keeper can't take it - that would complete the XI
+  // with zero keepers. Earlier slots stay open to any pickable player.
+  if (!player.isKeeper && !assignedPlayers.some((p) => p.isKeeper) && openSlots(arrangement).length === 1) {
+    return [];
+  }
+
+  return open;
 }
 
-export function isTeamAlive(team: TeamSeason, arrangement: Record<number, string>): boolean {
-  return team.players.some((p) => isPlayerPickable(p, arrangement));
+export function isPlayerPickable(player: Player, arrangement: Record<number, string>, context?: RosterContext): boolean {
+  return validSlotsForPlayer(player, arrangement, context).length > 0;
+}
+
+export function isTeamAlive(team: TeamSeason, arrangement: Record<number, string>, context?: RosterContext): boolean {
+  return team.players.some((p) => isPlayerPickable(p, arrangement, context));
 }
 
 /** First team-season in pool order that hasn't been resolved (picked-from or skipped) yet. */
@@ -34,6 +63,8 @@ export function findNextTeamIndex(
   return null;
 }
 
-export function isLineupComplete(arrangement: Record<number, string>): boolean {
-  return openSlots(arrangement).length === 0;
+export function isLineupComplete(arrangement: Record<number, string>, context?: RosterContext): boolean {
+  if (openSlots(arrangement).length !== 0) return false;
+  if (!context) return true;
+  return context.assignedPlayers.some((p) => p.isKeeper);
 }

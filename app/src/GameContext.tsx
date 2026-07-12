@@ -1,7 +1,21 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
 import { fetchSquads, submitLineup } from './api';
-import { findNextTeamIndex, isLineupComplete, isTeamAlive } from './draft';
+import { findNextTeamIndex, isLineupComplete, isTeamAlive, validSlotsForPlayer } from './draft';
 import type { Player, ResultResponse, TeamSeason } from './types';
+
+function findPlayerInPool(pool: TeamSeason[], id: string): Player | undefined {
+  for (const t of pool) {
+    const p = t.players.find((pl) => pl.id === id);
+    if (p) return p;
+  }
+  return undefined;
+}
+
+function resolveAssignedPlayers(pool: TeamSeason[], arrangement: Record<number, string>): Player[] {
+  return Object.values(arrangement)
+    .map((id) => findPlayerInPool(pool, id))
+    .filter((p): p is Player => !!p);
+}
 
 interface DraftState {
   pool: TeamSeason[];
@@ -76,7 +90,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const advanceIfDead = useCallback(() => {
     setDraft((d) => {
       if (!d) return d;
-      if (isLineupComplete(d.arrangement)) return d;
+      const assignedPlayers = resolveAssignedPlayers(d.pool, d.arrangement);
+      if (isLineupComplete(d.arrangement, { assignedPlayers })) return d;
       let pointer = d.teamPointer;
       let resolved = d.resolvedTeamIds;
       let changed = false;
@@ -88,7 +103,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
           pointer = next;
           continue;
         }
-        if (!isTeamAlive(team, d.arrangement)) {
+        if (!isTeamAlive(team, d.arrangement, { assignedPlayers })) {
           if (!changed) resolved = new Set(resolved);
           resolved.add(team.id);
           changed = true;
@@ -108,6 +123,13 @@ export function GameProvider({ children }: { children: ReactNode }) {
     setDraft((d) => {
       if (!d) return d;
       if (d.arrangement[slot]) return d;
+      // Authoritative check (mirrors what the UI already disables via
+      // validSlotsForPlayer) - the overseas cap and the "can't take the last
+      // open slot without a keeper picked" rule both get enforced here too,
+      // not just in what's clickable, so this can't be bypassed.
+      const assignedPlayers = resolveAssignedPlayers(d.pool, d.arrangement);
+      const valid = validSlotsForPlayer(player, d.arrangement, { assignedPlayers });
+      if (!valid.includes(slot)) return d;
       const resolved = new Set(d.resolvedTeamIds);
       resolved.add(teamSeasonId);
       const skipped = new Set(d.skippedTeamIds);
@@ -147,7 +169,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const submitCurrentLineup = useCallback(async () => {
-    if (!draft || !isLineupComplete(draft.arrangement)) return;
+    if (!draft) return;
+    const assignedPlayers = resolveAssignedPlayers(draft.pool, draft.arrangement);
+    if (!isLineupComplete(draft.arrangement, { assignedPlayers })) return;
     setSubmitting(true);
     setError(null);
     try {

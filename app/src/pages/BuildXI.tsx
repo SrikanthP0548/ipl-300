@@ -4,10 +4,9 @@ import { useGame } from '../GameContext';
 import { RoleBadge } from '../components/RoleBadge';
 import { ScoreReadout } from '../components/ScoreReadout';
 import { KeeperIcon, OverseasIcon } from '../components/PlayerIcons';
-import { isLineupComplete, validSlotsForPlayer } from '../draft';
+import { isLineupComplete, MAX_OVERSEAS, validSlotsForPlayer } from '../draft';
 import type { Player, TeamSeason } from '../types';
 
-const MAX_OVERSEAS = 4;
 const DESKTOP_BREAKPOINT = '(min-width: 900px)';
 
 /** Style for the OS/WK count chips: teal while within the real-XI limit,
@@ -132,7 +131,12 @@ export function BuildXI() {
     if (result) navigate('/chase');
   }, [result, navigate]);
 
-  const complete = draft ? isLineupComplete(draft.arrangement) : false;
+  const assignedPlayers = draft
+    ? Object.values(draft.arrangement)
+        .map((id) => allPlayersById.get(id)?.player)
+        .filter((p): p is Player => !!p)
+    : [];
+  const complete = draft ? isLineupComplete(draft.arrangement, { assignedPlayers }) : false;
   const { spinning, spinTeam } = useTeamSpin(draft?.pool, complete ? null : (draft?.teamPointer ?? null));
 
   if (!draft) {
@@ -145,9 +149,6 @@ export function BuildXI() {
 
   const filledCount = Object.keys(draft.arrangement).length;
 
-  const assignedPlayers = Object.values(draft.arrangement)
-    .map((id) => allPlayersById.get(id)?.player)
-    .filter((p): p is Player => !!p);
   const overseasCount = assignedPlayers.filter((p) => p.isOverseas).length;
   const keeperCount = assignedPlayers.filter((p) => p.isKeeper).length;
   const overseasOk = overseasCount <= MAX_OVERSEAS;
@@ -292,6 +293,7 @@ export function BuildXI() {
                     player={p}
                     accent={accent}
                     arrangement={draft.arrangement}
+                    assignedPlayers={assignedPlayers}
                     scoresVisible={scoresVisible}
                     expanded={expandedPlayerId === p.id}
                     onToggle={() => setExpandedPlayerId((id) => (id === p.id ? null : p.id))}
@@ -356,7 +358,7 @@ export function BuildXI() {
       {!complete && !spinning && currentTeam && (
         <div className="player-list" style={{ ['--card-accent' as string]: accent }}>
           {currentTeam.players.map((p) => {
-            const validSlots = validSlotsForPlayer(p, draft.arrangement);
+            const validSlots = validSlotsForPlayer(p, draft.arrangement, { assignedPlayers });
             const pickable = validSlots.length > 0;
             const expanded = expandedPlayerId === p.id;
             return (
@@ -419,6 +421,7 @@ function DesktopPlayerCard({
   player: p,
   accent,
   arrangement,
+  assignedPlayers,
   scoresVisible,
   expanded,
   onToggle,
@@ -427,12 +430,13 @@ function DesktopPlayerCard({
   player: Player;
   accent: string;
   arrangement: Record<number, string>;
+  assignedPlayers: Player[];
   scoresVisible: boolean;
   expanded: boolean;
   onToggle: () => void;
   onPick: (slot: number) => void;
 }) {
-  const validSlots = validSlotsForPlayer(p, arrangement);
+  const validSlots = validSlotsForPlayer(p, arrangement, { assignedPlayers });
   const pickable = validSlots.length > 0;
 
   return (
