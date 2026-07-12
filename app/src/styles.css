@@ -520,12 +520,22 @@
   animation-delay: 0.4s;
 }
 
+.team-header {
+  position: relative;
+  padding: 12px 0 14px;
+  border-bottom: 3px solid color-mix(in srgb, var(--card-accent, var(--gold)) 50%, transparent);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--card-accent, var(--gold)) 15%, transparent),
+    color-mix(in srgb, var(--card-accent, var(--gold)) 2%, transparent) 55%,
+    transparent 100%
+  );
+}
 .team-banner {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 10px 0 4px;
 }
 .team-banner-name {
   font-family: var(--font-display);
@@ -537,12 +547,12 @@
 .team-banner-hint {
   font-size: 12.5px;
   color: var(--text-muted);
-  margin-bottom: 10px;
+  margin-top: 6px;
 }
 .skip-btn {
   flex-shrink: 0;
-  border: 1px solid var(--border-strong);
-  background: var(--surface);
+  border: 1.5px solid color-mix(in srgb, var(--card-accent, var(--gold)) 50%, transparent);
+  background: color-mix(in srgb, var(--card-accent, var(--gold)) 12%, transparent);
   border-radius: 8px;
   padding: 8px 14px;
   cursor: pointer;
@@ -550,8 +560,9 @@
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.5px;
-  color: var(--text-secondary);
+  color: var(--card-accent, var(--gold));
   text-transform: uppercase;
+  box-shadow: 0 0 12px color-mix(in srgb, var(--card-accent, var(--gold)) 19%, transparent);
 }
 .skip-btn:disabled {
   opacity: 0.4;
@@ -564,7 +575,7 @@
 .player-card {
   padding: 12px 14px;
   margin-bottom: 8px;
-  border-left: 3px solid var(--card-accent, var(--gold));
+  border-left: 5px solid var(--card-accent, var(--gold));
   cursor: pointer;
 }
 .player-card.expanded {

@@ -163,16 +163,18 @@ export function BuildXI() {
 
       {!complete && !spinning && currentTeam && (
         <>
-          <div className="team-banner">
-            <div className="team-banner-name">
-              {currentTeam.franchise} · {currentTeam.season}
+          <div className="team-header" style={{ ['--card-accent' as string]: teamColor(draft.teamPointer) }}>
+            <div className="team-banner">
+              <div className="team-banner-name">
+                {currentTeam.franchise} · {currentTeam.season}
+              </div>
+              <button className="skip-btn" onClick={skipCurrentTeam} disabled={!canSkipCurrentTeam}>
+                Skip Team →
+              </button>
             </div>
-            <button className="skip-btn" onClick={skipCurrentTeam} disabled={!canSkipCurrentTeam}>
-              Skip Team →
-            </button>
-          </div>
-          <div className="team-banner-hint">
-            {canSkipCurrentTeam ? 'Tap a player to choose their position, or skip this team.' : 'Tap a player to choose their position. No skips left.'}
+            <div className="team-banner-hint">
+              {canSkipCurrentTeam ? 'Tap a player to choose their position, or skip this team.' : 'Tap a player to choose their position. No skips left.'}
+            </div>
           </div>
 
           <div className="player-list" style={{ ['--card-accent' as string]: teamColor(draft.teamPointer) }}>
