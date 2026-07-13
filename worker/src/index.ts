@@ -3,6 +3,7 @@ import { pickSquadPool, ALL_TEAM_SEASONS } from './squads';
 import { sign, verify } from './sign';
 import { evaluateEligibility, pickBand, WIN_LOTTERY_RATE } from './eligibility';
 import { simulateChase } from './simulate';
+import { fetchLeaderboard, insertLeaderboardEntry, sanitizeName, type LeaderboardRange } from './leaderboard';
 
 function corsHeaders(env: Env): Record<string, string> {
   return {
@@ -123,6 +124,66 @@ async function handleResult(request: Request, env: Env): Promise<Response> {
   );
 }
 
+interface LeaderboardSubmitBody {
+  name?: string;
+  poolIds?: string[];
+  finalScore?: number;
+  finalWickets?: number;
+  ballsBowled?: number;
+  resultToken?: string;
+}
+
+async function handleLeaderboardSubmit(request: Request, env: Env): Promise<Response> {
+  let body: LeaderboardSubmitBody;
+  try {
+    body = await request.json();
+  } catch {
+    return error('invalid JSON body', env);
+  }
+
+  const { name: rawName, poolIds, finalScore, finalWickets, ballsBowled, resultToken } = body;
+  if (
+    !Array.isArray(poolIds) ||
+    typeof finalScore !== 'number' ||
+    typeof finalWickets !== 'number' ||
+    typeof ballsBowled !== 'number' ||
+    typeof resultToken !== 'string' ||
+    typeof rawName !== 'string'
+  ) {
+    return error('missing or invalid submission fields', env);
+  }
+
+  const name = sanitizeName(rawName);
+  if (!name) return error('name is required', env);
+
+  if (finalScore < 301) return error('only a successful chase can be submitted to the leaderboard', env);
+
+  const resultSummary = `${finalScore}:${finalWickets}:${ballsBowled}:${poolIds.join(',')}`;
+  const validToken = await verify(resultSummary, resultToken, env.POOL_SECRET);
+  if (!validToken) return error('invalid or tampered resultToken', env, 403);
+
+  const outcome = await insertLeaderboardEntry(env, {
+    name,
+    score: finalScore,
+    wickets: finalWickets,
+    balls: ballsBowled,
+    resultToken,
+  });
+
+  return json({ ok: true, duplicate: outcome === 'duplicate' }, env);
+}
+
+const VALID_RANGES: LeaderboardRange[] = ['today', 'week', 'alltime'];
+
+async function handleLeaderboardList(url: URL, env: Env): Promise<Response> {
+  const rangeParam = url.searchParams.get('range') ?? 'alltime';
+  if (!VALID_RANGES.includes(rangeParam as LeaderboardRange)) {
+    return error(`range must be one of: ${VALID_RANGES.join(', ')}`, env);
+  }
+  const entries = await fetchLeaderboard(env, rangeParam as LeaderboardRange);
+  return json({ entries }, env);
+}
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
@@ -137,6 +198,14 @@ export default {
 
     if (url.pathname === '/api/result' && request.method === 'POST') {
       return handleResult(request, env);
+    }
+
+    if (url.pathname === '/api/leaderboard' && request.method === 'POST') {
+      return handleLeaderboardSubmit(request, env);
+    }
+
+    if (url.pathname === '/api/leaderboard' && request.method === 'GET') {
+      return handleLeaderboardList(url, env);
     }
 
     return error('not found', env, 404);

@@ -1,4 +1,4 @@
-import type { ResultResponse, SquadsResponse } from './types';
+import type { LeaderboardEntry, LeaderboardRange, ResultResponse, SquadsResponse } from './types';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8787';
 
@@ -30,4 +30,27 @@ export function submitLineup(
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ poolIds, poolToken, arrangement }),
   }).then((r) => asJson<ResultResponse>(r));
+}
+
+export function submitLeaderboardEntry(
+  name: string,
+  poolIds: string[],
+  result: Pick<ResultResponse, 'finalScore' | 'finalWickets' | 'ballsBowled' | 'resultToken'>,
+): Promise<{ ok: true; duplicate: boolean }> {
+  return fetch(`${API_BASE}/api/leaderboard`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name,
+      poolIds,
+      finalScore: result.finalScore,
+      finalWickets: result.finalWickets,
+      ballsBowled: result.ballsBowled,
+      resultToken: result.resultToken,
+    }),
+  }).then((r) => asJson<{ ok: true; duplicate: boolean }>(r));
+}
+
+export function fetchLeaderboard(range: LeaderboardRange): Promise<{ entries: LeaderboardEntry[] }> {
+  return fetch(`${API_BASE}/api/leaderboard?range=${range}`).then((r) => asJson<{ entries: LeaderboardEntry[] }>(r));
 }

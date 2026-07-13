@@ -152,7 +152,7 @@ export function BuildXI() {
         .map((id) => allPlayersById.get(id)?.player)
         .filter((p): p is Player => !!p)
     : [];
-  const complete = draft ? isLineupComplete(draft.arrangement, { assignedPlayers }) : false;
+  const complete = draft ? isLineupComplete(draft.arrangement) : false;
   const { spinning, spinTeam } = useTeamSpin(draft?.pool, complete ? null : (draft?.teamPointer ?? null));
 
   if (!draft) {
@@ -164,6 +164,10 @@ export function BuildXI() {
   }
 
   const filledCount = Object.keys(draft.arrangement).length;
+  // The keeper rule stands down for the last remaining team-season - see
+  // isLastTeam in draft.ts for why (a fixed roster's ranges may not cover
+  // the one remaining slot with a keeper, and there's nowhere left to turn).
+  const isLastTeam = draft.pool.filter((t) => !draft.resolvedTeamIds.has(t.id)).length === 1;
 
   const overseasCount = assignedPlayers.filter((p) => p.isOverseas).length;
   const keeperCount = assignedPlayers.filter((p) => p.isKeeper).length;
@@ -307,6 +311,7 @@ export function BuildXI() {
                     accent={accent}
                     arrangement={draft.arrangement}
                     assignedPlayers={assignedPlayers}
+                    isLastTeam={isLastTeam}
                     scoresVisible={scoresVisible}
                     expanded={expandedPlayerId === p.id}
                     onToggle={() => setExpandedPlayerId((id) => (id === p.id ? null : p.id))}
@@ -366,7 +371,7 @@ export function BuildXI() {
       {!complete && !spinning && currentTeam && (
         <div className="player-list" style={{ ['--card-accent' as string]: accent }}>
           {currentTeam.players.map((p) => {
-            const validSlots = validSlotsForPlayer(p, draft.arrangement, { assignedPlayers });
+            const validSlots = validSlotsForPlayer(p, draft.arrangement, { assignedPlayers, isLastTeam });
             const pickable = validSlots.length > 0;
             const expanded = expandedPlayerId === p.id;
             return (
@@ -430,6 +435,7 @@ function DesktopPlayerCard({
   accent,
   arrangement,
   assignedPlayers,
+  isLastTeam,
   scoresVisible,
   expanded,
   onToggle,
@@ -439,12 +445,13 @@ function DesktopPlayerCard({
   accent: string;
   arrangement: Record<number, string>;
   assignedPlayers: Player[];
+  isLastTeam: boolean;
   scoresVisible: boolean;
   expanded: boolean;
   onToggle: () => void;
   onPick: (slot: number) => void;
 }) {
-  const validSlots = validSlotsForPlayer(p, arrangement, { assignedPlayers });
+  const validSlots = validSlotsForPlayer(p, arrangement, { assignedPlayers, isLastTeam });
   const pickable = validSlots.length > 0;
 
   return (
