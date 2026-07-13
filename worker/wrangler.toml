@@ -28,4 +28,4 @@ enabled = false
 [[d1_databases]]
 binding = "DB"
 database_name = "ipl300-leaderboard"
-database_id = "00000000-0000-0000-0000-000000000000"
+database_id = "434bd284-1e27-431b-8909-b2ed1cc4ec3f"
