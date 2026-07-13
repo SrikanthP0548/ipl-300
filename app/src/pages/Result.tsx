@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useGame } from '../GameContext';
 import { Confetti } from '../components/Confetti';
 import { headlineFor, pickAnalysis } from '../copy';
 import { drawShareCard } from '../shareCard';
+import { submitLeaderboardEntry } from '../api';
 
 export function Result() {
   const navigate = useNavigate();
@@ -11,6 +12,8 @@ export function Result() {
   const [retrying, setRetrying] = useState(false);
   const [shareState, setShareState] = useState<'idle' | 'ready' | 'sharing'>('idle');
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [leaderboardName, setLeaderboardName] = useState('');
+  const [leaderboardState, setLeaderboardState] = useState<'idle' | 'submitting' | 'submitted' | 'error'>('idle');
 
   useEffect(() => {
     if (!draft) navigate('/', { replace: true });
@@ -70,6 +73,17 @@ export function Result() {
     }, 'image/png');
   };
 
+  const onSubmitLeaderboard = async () => {
+    if (!draft || !leaderboardName.trim()) return;
+    setLeaderboardState('submitting');
+    try {
+      await submitLeaderboardEntry(leaderboardName.trim(), draft.poolIds, result);
+      setLeaderboardState('submitted');
+    } catch {
+      setLeaderboardState('error');
+    }
+  };
+
   const rows = batsmen.map((b, i) => {
     const entry = allPlayersById.get(b.playerId);
     const status = b.out ? 'out' : b.balls > 0 ? 'not out' : 'did not bat';
@@ -100,6 +114,40 @@ export function Result() {
           <div className="best-performer-line">
             {bestPerformer.runs} off {bestPerformer.balls} balls
           </div>
+        </div>
+      )}
+
+      {won && leaderboardState !== 'submitted' && (
+        <div className="leaderboard-entry-box">
+          <div className="leaderboard-entry-label">Made the chase — put your name on the board</div>
+          <div className="leaderboard-entry-row">
+            <input
+              className="leaderboard-name-input"
+              type="text"
+              placeholder="Your name"
+              maxLength={24}
+              value={leaderboardName}
+              onChange={(e) => setLeaderboardName(e.target.value)}
+              disabled={leaderboardState === 'submitting'}
+            />
+            <button
+              className="btn-primary"
+              onClick={onSubmitLeaderboard}
+              disabled={leaderboardState === 'submitting' || !leaderboardName.trim()}
+            >
+              {leaderboardState === 'submitting' ? 'Submitting…' : 'Submit Score'}
+            </button>
+          </div>
+          {leaderboardState === 'error' && <div className="home-error">Couldn't submit your score. Try again.</div>}
+        </div>
+      )}
+
+      {won && leaderboardState === 'submitted' && (
+        <div className="leaderboard-entry-box submitted">
+          <div className="leaderboard-entry-label">You're on the board.</div>
+          <Link to="/leaderboard" className="btn-secondary leaderboard-view-link">
+            View Leaderboard
+          </Link>
         </div>
       )}
 

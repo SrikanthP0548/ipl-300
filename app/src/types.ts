@@ -82,3 +82,13 @@ export interface ResultResponse {
   bestPerformer: { slot: number; name: string; runs: number; balls: number } | null;
   resultToken: string;
 }
+
+export type LeaderboardRange = 'today' | 'week' | 'alltime';
+
+export interface LeaderboardEntry {
+  name: string;
+  score: number;
+  wickets: number;
+  balls: number;
+  createdAt: number;
+}

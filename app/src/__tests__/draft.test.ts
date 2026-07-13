@@ -96,13 +96,22 @@ describe('draft helpers', () => {
     expect(validSlotsForPlayer(nonKeeper, arrangement, { assignedPlayers: [] })).toEqual([2, 3, 4, 5]);
   });
 
-  it('requires a keeper among the assigned players for the lineup to count as complete', () => {
+  it('lets a non-keeper take the last open slot when this is the last remaining team-season', () => {
+    // A fixed roster's slot ranges may simply not include a keeper who
+    // covers the one remaining slot - blocking here would strand the draft
+    // with no team left to turn to, so the last team is exempt.
+    const nonKeeper = player({ id: 'batter', isKeeper: false, minPos: 1, maxPos: 11 });
+    const arrangement: Record<number, string> = {};
+    for (let s = 1; s <= 10; s++) arrangement[s] = `p${s}`;
+
+    expect(validSlotsForPlayer(nonKeeper, arrangement, { assignedPlayers: [], isLastTeam: false })).toEqual([]);
+    expect(validSlotsForPlayer(nonKeeper, arrangement, { assignedPlayers: [], isLastTeam: true })).toEqual([11]);
+  });
+
+  it('marks a lineup complete once all eleven slots are filled, regardless of keeper presence', () => {
     const arrangement: Record<number, string> = {};
     for (let s = 1; s <= 11; s++) arrangement[s] = `p${s}`;
-    const noKeeperRoster = Array.from({ length: 11 }, (_, i) => player({ id: `p${i}`, isKeeper: false }));
-    const withKeeperRoster = [...noKeeperRoster.slice(0, 10), player({ id: 'p10', isKeeper: true })];
 
-    expect(isLineupComplete(arrangement, { assignedPlayers: noKeeperRoster })).toBe(false);
-    expect(isLineupComplete(arrangement, { assignedPlayers: withKeeperRoster })).toBe(true);
+    expect(isLineupComplete(arrangement)).toBe(true);
   });
 });

@@ -4,6 +4,7 @@ import { Home } from './pages/Home';
 import { BuildXI } from './pages/BuildXI';
 import { Chase } from './pages/Chase';
 import { Result } from './pages/Result';
+import { Leaderboard } from './pages/Leaderboard';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
             <Route path="/build" element={<BuildXI />} />
             <Route path="/chase" element={<Chase />} />
             <Route path="/result" element={<Result />} />
+            <Route path="/leaderboard" element={<Leaderboard />} />
           </Routes>
         </div>
       </HashRouter>
