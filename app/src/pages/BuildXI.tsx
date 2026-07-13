@@ -4,10 +4,9 @@ import { useGame } from '../GameContext';
 import { RoleBadge } from '../components/RoleBadge';
 import { ScoreReadout } from '../components/ScoreReadout';
 import { KeeperIcon, OverseasIcon } from '../components/PlayerIcons';
-import { isLineupComplete, validSlotsForPlayer } from '../draft';
+import { isLineupComplete, MAX_OVERSEAS, validSlotsForPlayer } from '../draft';
 import type { Player, TeamSeason } from '../types';
 
-const MAX_OVERSEAS = 4;
 const DESKTOP_BREAKPOINT = '(min-width: 900px)';
 
 /** Style for the OS/WK count chips: teal while within the real-XI limit,
@@ -33,11 +32,28 @@ function limitChipStyle(ok: boolean): CSSProperties {
 // team-reveal effect — mirrors a slot machine winding down.
 const SPIN_DELAYS = [40, 45, 55, 65, 80, 95, 115, 140, 170, 205, 250, 310, 380];
 
-// Cycled by pool position (up to 15 team-seasons per draft) to give each
-// team-season a distinct accent color for the player card's left border.
-const TEAM_COLORS = ['#FFD23F', '#5B7FFF', '#22D3C6', '#A855F7', '#FF4D4D', '#FF3E9A'];
-function teamColor(poolIndex: number): string {
-  return TEAM_COLORS[poolIndex % TEAM_COLORS.length];
+// Each franchise's real-world brand color (sourced from official kits/logos),
+// used as the accent for that team-season's player card border/header.
+const FRANCHISE_COLORS: Record<string, string> = {
+  'Chennai Super Kings': '#F9CD05',
+  'Deccan Chargers': '#5B85C4',
+  'Delhi Capitals': '#2561AE',
+  'Gujarat Lions': '#A31D21',
+  'Gujarat Titans': '#D4AF37',
+  'Kochi Tuskers Kerala': '#8E44AD',
+  'Kolkata Knight Riders': '#6B3FA0',
+  'Lucknow Super Giants': '#F28B00',
+  'Mumbai Indians': '#1C64D1',
+  'Pune Warriors': '#EA4C2D',
+  'Punjab Kings': '#C8102E',
+  'Rajasthan Royals': '#E4007C',
+  'Rising Pune Supergiant': '#D11D9B',
+  'Royal Challengers Bengaluru': '#EC1C24',
+  'Sunrisers Hyderabad': '#EE7429',
+};
+const DEFAULT_TEAM_COLOR = '#5B7FFF';
+function teamColor(franchise: string | undefined): string {
+  return (franchise && FRANCHISE_COLORS[franchise]) || DEFAULT_TEAM_COLOR;
 }
 
 /** Purely cosmetic: flickers through team names before landing on the real
@@ -102,7 +118,6 @@ export function BuildXI() {
     draft,
     status,
     scoresVisible,
-    toggleScores,
     advanceIfDead,
     pickPlayer,
     skipCurrentTeam,
@@ -132,7 +147,12 @@ export function BuildXI() {
     if (result) navigate('/chase');
   }, [result, navigate]);
 
-  const complete = draft ? isLineupComplete(draft.arrangement) : false;
+  const assignedPlayers = draft
+    ? Object.values(draft.arrangement)
+        .map((id) => allPlayersById.get(id)?.player)
+        .filter((p): p is Player => !!p)
+    : [];
+  const complete = draft ? isLineupComplete(draft.arrangement, { assignedPlayers }) : false;
   const { spinning, spinTeam } = useTeamSpin(draft?.pool, complete ? null : (draft?.teamPointer ?? null));
 
   if (!draft) {
@@ -145,9 +165,6 @@ export function BuildXI() {
 
   const filledCount = Object.keys(draft.arrangement).length;
 
-  const assignedPlayers = Object.values(draft.arrangement)
-    .map((id) => allPlayersById.get(id)?.player)
-    .filter((p): p is Player => !!p);
   const overseasCount = assignedPlayers.filter((p) => p.isOverseas).length;
   const keeperCount = assignedPlayers.filter((p) => p.isKeeper).length;
   const overseasOk = overseasCount <= MAX_OVERSEAS;
@@ -164,7 +181,7 @@ export function BuildXI() {
     await submitCurrentLineup();
   };
 
-  const accent = teamColor(draft.teamPointer);
+  const accent = teamColor(draft.pool[draft.teamPointer]?.franchise);
 
   const limitChips = (
     <>
@@ -232,9 +249,6 @@ export function BuildXI() {
             IPL<span className="wordmark-accent">-300</span>
             <span className="desktop-topbar-subtitle">Build Your XI</span>
           </div>
-          <button className="toggle-scores-btn" onClick={toggleScores} style={{ color: scoresVisible ? 'var(--teal)' : 'var(--text-muted)' }}>
-            {scoresVisible ? 'Scores: On' : 'Scores: Off'}
-          </button>
         </div>
 
         <div className="desktop-body">
@@ -256,7 +270,7 @@ export function BuildXI() {
                   <span className="desktop-slot-n">{n}</span>
                   <span
                     className="desktop-slot-dot"
-                    style={occupant ? { background: teamColor(occupant.teamIndex), boxShadow: `0 0 8px ${teamColor(occupant.teamIndex)}` } : undefined}
+                    style={occupant ? { background: teamColor(occupant.franchise), boxShadow: `0 0 8px ${teamColor(occupant.franchise)}` } : undefined}
                   />
                   <span className={occupant ? 'desktop-slot-name filled' : 'desktop-slot-name'}>
                     {occupant ? occupant.player.name : 'Empty'}
@@ -292,6 +306,7 @@ export function BuildXI() {
                     player={p}
                     accent={accent}
                     arrangement={draft.arrangement}
+                    assignedPlayers={assignedPlayers}
                     scoresVisible={scoresVisible}
                     expanded={expandedPlayerId === p.id}
                     onToggle={() => setExpandedPlayerId((id) => (id === p.id ? null : p.id))}
@@ -322,12 +337,7 @@ export function BuildXI() {
           <div className="section-label">
             Selected Team XI <span className="accent-teal">{filledCount}/11</span>
           </div>
-          <div className="header-chip-row">
-            {limitChips}
-            <button className="toggle-scores-btn" onClick={toggleScores} style={{ color: scoresVisible ? 'var(--teal)' : 'var(--text-muted)' }}>
-              {scoresVisible ? 'Scores: On' : 'Scores: Off'}
-            </button>
-          </div>
+          <div className="header-chip-row">{limitChips}</div>
         </div>
       </div>
 
@@ -356,7 +366,7 @@ export function BuildXI() {
       {!complete && !spinning && currentTeam && (
         <div className="player-list" style={{ ['--card-accent' as string]: accent }}>
           {currentTeam.players.map((p) => {
-            const validSlots = validSlotsForPlayer(p, draft.arrangement);
+            const validSlots = validSlotsForPlayer(p, draft.arrangement, { assignedPlayers });
             const pickable = validSlots.length > 0;
             const expanded = expandedPlayerId === p.id;
             return (
@@ -419,6 +429,7 @@ function DesktopPlayerCard({
   player: p,
   accent,
   arrangement,
+  assignedPlayers,
   scoresVisible,
   expanded,
   onToggle,
@@ -427,12 +438,13 @@ function DesktopPlayerCard({
   player: Player;
   accent: string;
   arrangement: Record<number, string>;
+  assignedPlayers: Player[];
   scoresVisible: boolean;
   expanded: boolean;
   onToggle: () => void;
   onPick: (slot: number) => void;
 }) {
-  const validSlots = validSlotsForPlayer(p, arrangement);
+  const validSlots = validSlotsForPlayer(p, arrangement, { assignedPlayers });
   const pickable = validSlots.length > 0;
 
   return (

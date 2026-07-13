@@ -45,8 +45,6 @@ describe('App', () => {
     await user.click(screen.getByRole('button', { name: /hidden/i }));
     await user.click(screen.getByRole('button', { name: /build your xi/i }));
 
-    expect(await screen.findByRole('button', { name: /scores: off/i })).toBeInTheDocument();
-
     expect(await screen.findAllByText('•••', {}, { timeout: 3500 })).toHaveLength(2);
   }, 6000);
 
