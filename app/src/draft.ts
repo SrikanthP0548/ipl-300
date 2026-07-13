@@ -11,9 +11,10 @@ export function openSlots(arrangement: Record<number, string>): number[] {
   return slots;
 }
 
-/** Roster-composition context needed to enforce the overseas cap and the
- * keeper requirement. Optional everywhere it's threaded through - omitting
- * it (e.g. in pure slot-range unit tests) just skips those two checks.
+/** Roster-composition context needed to enforce the no-duplicate-player
+ * rule, the overseas cap, and the keeper requirement. Optional everywhere
+ * it's threaded through - omitting it (e.g. in pure slot-range unit tests)
+ * just skips those checks.
  *
  * isLastTeam: true when the team this player belongs to is the only
  * team-season left unresolved in the pool. The keeper rule stands down in
@@ -35,6 +36,15 @@ export function validSlotsForPlayer(
   if (open.length === 0 || !context) return open;
 
   const { assignedPlayers } = context;
+
+  // Real-XI rule: the same real player can't be drafted twice under a
+  // different team-season (e.g. AB de Villiers from RCB 2015 and RCB 2020
+  // are the same person - once picked, every other team-season's instance
+  // of them is off the table). Never exempted, even for the last team - two
+  // slots can't legally hold the same human being.
+  if (assignedPlayers.some((p) => p.name === player.name)) {
+    return [];
+  }
 
   // Real-XI rule: at most 4 overseas players. A cap, not a minimum - 0-4 is fine.
   if (player.isOverseas && assignedPlayers.filter((p) => p.isOverseas).length >= MAX_OVERSEAS) {
