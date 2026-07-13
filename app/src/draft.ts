@@ -13,9 +13,17 @@ export function openSlots(arrangement: Record<number, string>): number[] {
 
 /** Roster-composition context needed to enforce the overseas cap and the
  * keeper requirement. Optional everywhere it's threaded through - omitting
- * it (e.g. in pure slot-range unit tests) just skips those two checks. */
+ * it (e.g. in pure slot-range unit tests) just skips those two checks.
+ *
+ * isLastTeam: true when the team this player belongs to is the only
+ * team-season left unresolved in the pool. The keeper rule stands down in
+ * that case - a team-season's roster and its players' slot ranges are fixed,
+ * so it's possible for the very last team to have no keeper whose range
+ * covers the one remaining open slot. Blocking here would strand the draft
+ * at 10/11 with no team left to turn to, so the last team is exempt. */
 export interface RosterContext {
   assignedPlayers: Player[];
+  isLastTeam?: boolean;
 }
 
 export function validSlotsForPlayer(
@@ -35,8 +43,14 @@ export function validSlotsForPlayer(
 
   // Real-XI rule: at least 1 keeper. If none picked yet and this is the only
   // slot left open, a non-keeper can't take it - that would complete the XI
-  // with zero keepers. Earlier slots stay open to any pickable player.
-  if (!player.isKeeper && !assignedPlayers.some((p) => p.isKeeper) && openSlots(arrangement).length === 1) {
+  // with zero keepers. Earlier slots stay open to any pickable player. This
+  // stands down for the last remaining team (see isLastTeam above).
+  if (
+    !player.isKeeper &&
+    !assignedPlayers.some((p) => p.isKeeper) &&
+    openSlots(arrangement).length === 1 &&
+    !context.isLastTeam
+  ) {
     return [];
   }
 
@@ -63,8 +77,6 @@ export function findNextTeamIndex(
   return null;
 }
 
-export function isLineupComplete(arrangement: Record<number, string>, context?: RosterContext): boolean {
-  if (openSlots(arrangement).length !== 0) return false;
-  if (!context) return true;
-  return context.assignedPlayers.some((p) => p.isKeeper);
+export function isLineupComplete(arrangement: Record<number, string>): boolean {
+  return openSlots(arrangement).length === 0;
 }

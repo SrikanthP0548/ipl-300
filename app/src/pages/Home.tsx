@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useGame } from '../GameContext';
 
 const RULES = [
@@ -85,7 +85,9 @@ export function Home() {
 
       <div className="home-footer-row">
         <div className="footer-note">v1 · local play only</div>
-        <div className="footer-badge">Leaderboard soon</div>
+        <Link to="/leaderboard" className="footer-badge">
+          Leaderboard
+        </Link>
       </div>
       <div className="footer-credit">
         <span>Developed by Srikanth · </span>

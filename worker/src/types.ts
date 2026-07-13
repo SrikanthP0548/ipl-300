@@ -24,4 +24,5 @@ export interface TeamSeason {
 export interface Env {
   ALLOWED_ORIGIN: string;
   POOL_SECRET: string;
+  DB: D1Database;
 }

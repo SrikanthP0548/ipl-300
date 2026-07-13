@@ -17,6 +17,10 @@ function resolveAssignedPlayers(pool: TeamSeason[], arrangement: Record<number, 
     .filter((p): p is Player => !!p);
 }
 
+function unresolvedCount(pool: TeamSeason[], resolvedTeamIds: Set<string>): number {
+  return pool.filter((t) => !resolvedTeamIds.has(t.id)).length;
+}
+
 interface DraftState {
   pool: TeamSeason[];
   poolIds: string[];
@@ -91,7 +95,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     setDraft((d) => {
       if (!d) return d;
       const assignedPlayers = resolveAssignedPlayers(d.pool, d.arrangement);
-      if (isLineupComplete(d.arrangement, { assignedPlayers })) return d;
+      if (isLineupComplete(d.arrangement)) return d;
       let pointer = d.teamPointer;
       let resolved = d.resolvedTeamIds;
       let changed = false;
@@ -99,16 +103,25 @@ export function GameProvider({ children }: { children: ReactNode }) {
         const team = d.pool[pointer];
         if (resolved.has(team.id)) {
           const next = findNextTeamIndex(d.pool, resolved, pointer + 1);
-          if (next === null) break;
+          if (next === null) {
+            pointer = d.pool.length;
+            break;
+          }
           pointer = next;
           continue;
         }
-        if (!isTeamAlive(team, d.arrangement, { assignedPlayers })) {
+        // This team is exempt from the keeper rule if it's the only one left
+        // unresolved - see isLastTeam in draft.ts.
+        const isLastTeam = unresolvedCount(d.pool, resolved) === 1;
+        if (!isTeamAlive(team, d.arrangement, { assignedPlayers, isLastTeam })) {
           if (!changed) resolved = new Set(resolved);
           resolved.add(team.id);
           changed = true;
           const next = findNextTeamIndex(d.pool, resolved, pointer + 1);
-          if (next === null) break;
+          if (next === null) {
+            pointer = d.pool.length;
+            break;
+          }
           pointer = next;
           continue;
         }
@@ -128,7 +141,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
       // open slot without a keeper picked" rule both get enforced here too,
       // not just in what's clickable, so this can't be bypassed.
       const assignedPlayers = resolveAssignedPlayers(d.pool, d.arrangement);
-      const valid = validSlotsForPlayer(player, d.arrangement, { assignedPlayers });
+      const isLastTeam = unresolvedCount(d.pool, d.resolvedTeamIds) === 1;
+      const valid = validSlotsForPlayer(player, d.arrangement, { assignedPlayers, isLastTeam });
       if (!valid.includes(slot)) return d;
       const resolved = new Set(d.resolvedTeamIds);
       resolved.add(teamSeasonId);
@@ -170,8 +184,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
   const submitCurrentLineup = useCallback(async () => {
     if (!draft) return;
-    const assignedPlayers = resolveAssignedPlayers(draft.pool, draft.arrangement);
-    if (!isLineupComplete(draft.arrangement, { assignedPlayers })) return;
+    if (!isLineupComplete(draft.arrangement)) return;
     setSubmitting(true);
     setError(null);
     try {

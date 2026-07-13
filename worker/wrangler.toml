@@ -18,3 +18,14 @@ enabled = false
 #   POOL_SECRET=some-long-random-dev-only-string
 # For production, set it with:
 #   npx wrangler secret put POOL_SECRET
+
+# Leaderboard storage. `wrangler dev` runs D1 against a local SQLite file
+# automatically (no cloud account needed) as long as this block is present,
+# so database_id below can stay a placeholder for local dev. For production:
+#   npx wrangler d1 create ipl300-leaderboard
+# then replace database_id with the id it prints, and run migrations with:
+#   npx wrangler d1 migrations apply ipl300-leaderboard --remote
+[[d1_databases]]
+binding = "DB"
+database_name = "ipl300-leaderboard"
+database_id = "00000000-0000-0000-0000-000000000000"
