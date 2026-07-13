@@ -53,12 +53,12 @@ describe('draft helpers', () => {
   });
 
   it('blocks an overseas player once the real-XI cap (4) is already reached', () => {
-    const overseasPick = player({ id: 'overseas-5', isOverseas: true, minPos: 1, maxPos: 11 });
+    const overseasPick = player({ id: 'overseas-5', name: 'Overseas Five', isOverseas: true, minPos: 1, maxPos: 11 });
     const fourOverseasAlready = [
-      player({ id: 'o1', isOverseas: true }),
-      player({ id: 'o2', isOverseas: true }),
-      player({ id: 'o3', isOverseas: true }),
-      player({ id: 'o4', isOverseas: true }),
+      player({ id: 'o1', name: 'Overseas One', isOverseas: true }),
+      player({ id: 'o2', name: 'Overseas Two', isOverseas: true }),
+      player({ id: 'o3', name: 'Overseas Three', isOverseas: true }),
+      player({ id: 'o4', name: 'Overseas Four', isOverseas: true }),
     ];
 
     expect(validSlotsForPlayer(overseasPick, { 1: 'x' }, { assignedPlayers: fourOverseasAlready })).toEqual([]);
@@ -68,15 +68,35 @@ describe('draft helpers', () => {
   });
 
   it('does not cap domestic players and has no overseas minimum', () => {
-    const domesticPick = player({ id: 'domestic', isOverseas: false, minPos: 1, maxPos: 11 });
+    const domesticPick = player({ id: 'domestic', name: 'Domestic Pick', isOverseas: false, minPos: 1, maxPos: 11 });
     const fourOverseasAlready = [
-      player({ id: 'o1', isOverseas: true }),
-      player({ id: 'o2', isOverseas: true }),
-      player({ id: 'o3', isOverseas: true }),
-      player({ id: 'o4', isOverseas: true }),
+      player({ id: 'o1', name: 'Overseas One', isOverseas: true }),
+      player({ id: 'o2', name: 'Overseas Two', isOverseas: true }),
+      player({ id: 'o3', name: 'Overseas Three', isOverseas: true }),
+      player({ id: 'o4', name: 'Overseas Four', isOverseas: true }),
     ];
 
     expect(validSlotsForPlayer(domesticPick, { 1: 'x' }, { assignedPlayers: fourOverseasAlready })).not.toEqual([]);
+  });
+
+  it('blocks the same real player (by name) from being picked twice under a different team-season', () => {
+    const alreadyPicked = player({ id: 'rcb-2015-abd', name: 'AB de Villiers', minPos: 1, maxPos: 11 });
+    const sameManDifferentSeason = player({ id: 'rcb-2020-abd', name: 'AB de Villiers', minPos: 1, maxPos: 11 });
+    const someoneElse = player({ id: 'other', name: 'Someone Else', minPos: 1, maxPos: 11 });
+
+    expect(
+      validSlotsForPlayer(sameManDifferentSeason, { 1: 'x' }, { assignedPlayers: [alreadyPicked] }),
+    ).toEqual([]);
+    expect(validSlotsForPlayer(someoneElse, { 1: 'x' }, { assignedPlayers: [alreadyPicked] })).not.toEqual([]);
+  });
+
+  it('never exempts the duplicate-player rule, even for the last remaining team', () => {
+    const alreadyPicked = player({ id: 'rcb-2015-abd', name: 'AB de Villiers', minPos: 1, maxPos: 11 });
+    const sameManDifferentSeason = player({ id: 'rcb-2020-abd', name: 'AB de Villiers', minPos: 1, maxPos: 11 });
+
+    expect(
+      validSlotsForPlayer(sameManDifferentSeason, { 1: 'x' }, { assignedPlayers: [alreadyPicked], isLastTeam: true }),
+    ).toEqual([]);
   });
 
   it('blocks a non-keeper from taking the last open slot when no keeper has been picked yet', () => {
