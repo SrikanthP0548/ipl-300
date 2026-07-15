@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGame } from '../GameContext';
+import { useTheme } from '../ThemeContext';
 import { RoleBadge } from '../components/RoleBadge';
 import { ScoreReadout } from '../components/ScoreReadout';
 import { KeeperIcon, OverseasIcon } from '../components/PlayerIcons';
@@ -52,8 +53,28 @@ const FRANCHISE_COLORS: Record<string, string> = {
   'Sunrisers Hyderabad': '#EE7429',
 };
 const DEFAULT_TEAM_COLOR = '#5B7FFF';
-function teamColor(franchise: string | undefined): string {
-  return (franchise && FRANCHISE_COLORS[franchise]) || DEFAULT_TEAM_COLOR;
+
+/** Several franchise colors (CSK yellow, GT gold, ...) read fine against the
+ * dark background but wash out to near-invisible against the light theme's
+ * near-white panels - darken any color whose luminance is too high before
+ * using it as a light-theme accent. */
+function readableOnLight(hex: string): string {
+  const c = hex.replace('#', '');
+  let r = parseInt(c.substring(0, 2), 16);
+  let g = parseInt(c.substring(2, 4), 16);
+  let b = parseInt(c.substring(4, 6), 16);
+  const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  if (lum <= 0.55) return hex;
+  const f = 0.55;
+  r = Math.round(r * f);
+  g = Math.round(g * f);
+  b = Math.round(b * f);
+  return '#' + [r, g, b].map((v) => v.toString(16).padStart(2, '0')).join('');
+}
+
+function teamColor(franchise: string | undefined, isLight: boolean): string {
+  const base = (franchise && FRANCHISE_COLORS[franchise]) || DEFAULT_TEAM_COLOR;
+  return isLight ? readableOnLight(base) : base;
 }
 
 /** Purely cosmetic: flickers through team names before landing on the real
@@ -114,6 +135,8 @@ function useMediaQuery(query: string): boolean {
 
 export function BuildXI() {
   const navigate = useNavigate();
+  const { theme } = useTheme();
+  const isLightTheme = theme === 'light';
   const {
     draft,
     status,
@@ -185,7 +208,7 @@ export function BuildXI() {
     await submitCurrentLineup();
   };
 
-  const accent = teamColor(draft.pool[draft.teamPointer]?.franchise);
+  const accent = teamColor(draft.pool[draft.teamPointer]?.franchise, isLightTheme);
 
   const limitChips = (
     <>
@@ -274,7 +297,14 @@ export function BuildXI() {
                   <span className="desktop-slot-n">{n}</span>
                   <span
                     className="desktop-slot-dot"
-                    style={occupant ? { background: teamColor(occupant.franchise), boxShadow: `0 0 8px ${teamColor(occupant.franchise)}` } : undefined}
+                    style={
+                      occupant
+                        ? {
+                            background: teamColor(occupant.franchise, isLightTheme),
+                            boxShadow: `0 0 8px ${teamColor(occupant.franchise, isLightTheme)}`,
+                          }
+                        : undefined
+                    }
                   />
                   <span className={occupant ? 'desktop-slot-name filled' : 'desktop-slot-name'}>
                     {occupant ? occupant.player.name : 'Empty'}

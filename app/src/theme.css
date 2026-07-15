@@ -8,6 +8,7 @@
   --surface-strong: rgba(255, 255, 255, 0.06);
   --border: rgba(255, 255, 255, 0.08);
   --border-strong: rgba(255, 255, 255, 0.14);
+  --overlay-scrim: rgba(4, 6, 14, 0.6);
 
   --text-primary: #f4f6fb;
   --text-secondary: #b7bfd6;
@@ -16,6 +17,7 @@
   --text-dim: #5c6480;
   --text-disabled: #4b5270;
 
+  /* Semantic accents - shift between themes (see [data-theme="light"] below). */
   --gold: #f2b441;
   --gold-hi: #ffcb63;
   --gold-glow: rgba(242, 180, 65, 0.5);
@@ -24,6 +26,18 @@
   --red: #f08477;
   --red-strong: #e2483a;
   --violet: #b6a6f5;
+
+  /* Brand gradient - the primary CTA button and "success" pills always use
+   * these exact tones regardless of theme (matches the design system: a
+   * button's own dark text (#17140a / #06231f) is chosen for this fixed
+   * gradient, so the gradient itself must stay fixed too). */
+  --brand-gold: #f2b441;
+  --brand-gold-hi: #ffcb63;
+  --brand-teal: #22d3c6;
+  --brand-teal-hi: #2ee6d6;
+
+  --scoreboard-bg: #0b0b0c;
+  --scoreboard-text: #f5f3ec;
 
   --role-batter-fg: #22d3c6;
   --role-batter-bg: rgba(34, 211, 198, 0.12);
@@ -45,6 +59,42 @@
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 14px;
+}
+
+/* Light theme - values sourced from the design tool's light-mode tokens
+ * (gold/teal/coral base palette + text/surface/border hierarchy). The
+ * --brand-* gradient vars and role-badge vars are intentionally NOT
+ * overridden here - those stay the same fixed brand tones in both themes. */
+:root[data-theme='light'] {
+  --bg-base: #e7ecf2;
+  --bg-panel-1: #fcfdff;
+  --bg-panel-2: #f3f6fa;
+  --bg-panel-3: #e7ecf2;
+  --bg-panel-4: #dce3ec;
+  --surface: rgba(20, 15, 5, 0.035);
+  --surface-strong: rgba(20, 15, 5, 0.05);
+  --border: rgba(20, 15, 5, 0.08);
+  --border-strong: rgba(20, 15, 5, 0.13);
+  --overlay-scrim: rgba(255, 250, 240, 0.72);
+
+  --text-primary: #221c10;
+  --text-secondary: #4a4536;
+  --text-muted: #6b6455;
+  --text-faint: #8c8570;
+  --text-dim: #a39c87;
+  --text-disabled: #b7af9b;
+
+  --gold: #b8860b;
+  --gold-hi: #b8860b;
+  --gold-glow: transparent;
+  --teal: #0c8f92;
+  --teal-hi: #0c8f92;
+  --red: #c9463c;
+  --red-strong: #b7402e;
+  --violet: #6b5fa8;
+
+  --scoreboard-bg: #ffffff;
+  --scoreboard-text: #221c10;
 }
 
 * {
@@ -265,4 +315,23 @@ a {
     max-width: 1100px;
     padding: 40px 48px;
   }
+}
+
+.theme-toggle-btn {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 10;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--border-strong);
+  background: var(--surface-strong);
+  color: var(--text-primary);
+  cursor: pointer;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
