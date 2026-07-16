@@ -1360,6 +1360,18 @@
 
 /* ---------- leaderboard page ---------- */
 
+.leaderboard-section-label {
+  margin-top: 22px;
+}
+.leaderboard-heading {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 32px;
+  letter-spacing: -0.5px;
+  color: var(--text-primary);
+  margin: 2px 0 0;
+}
+
 .leaderboard-tabs {
   display: flex;
   gap: 8px;
