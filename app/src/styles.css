@@ -538,7 +538,7 @@
   font-family: var(--font-display);
   font-size: 22px;
   font-weight: 800;
-  color: var(--gold);
+  color: var(--card-accent, var(--gold));
   letter-spacing: -0.5px;
 }
 .team-banner-hint {
@@ -567,6 +567,40 @@
   color: var(--text-disabled);
   box-shadow: none;
   cursor: not-allowed;
+}
+
+/* Light theme: the team header becomes a solid diagonal banner in the
+ * team's own color instead of a translucent wash on the page background
+ * (per the design) - readableOnLight's darkening doesn't apply here since
+ * white text + a drop shadow carries contrast instead, same as the design. */
+:root[data-theme='light'] .team-header {
+  border-bottom: none;
+  background: linear-gradient(
+    135deg,
+    var(--card-accent, var(--gold)) 0%,
+    color-mix(in srgb, var(--card-accent, var(--gold)) 72%, black) 100%
+  );
+}
+:root[data-theme='light'] .team-banner-name {
+  color: #ffffff;
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.45);
+}
+:root[data-theme='light'] .team-banner-hint {
+  color: rgba(255, 255, 255, 0.85);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+:root[data-theme='light'] .skip-btn {
+  border: 1.5px solid rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+  box-shadow: none;
+}
+:root[data-theme='light'] .skip-btn:disabled {
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.6);
+  text-shadow: none;
 }
 
 .player-list {
@@ -846,6 +880,9 @@
   opacity: 0.4;
   cursor: not-allowed;
 }
+.desktop-player-card.compact {
+  padding: 12px 20px;
+}
 .desktop-player-row {
   display: flex;
   align-items: center;
@@ -853,9 +890,24 @@
   gap: 14px;
   flex-wrap: wrap;
 }
+.desktop-player-row.compact {
+  flex-wrap: nowrap;
+}
 .desktop-player-identity {
   flex: 1 1 160px;
   min-width: 0;
+}
+.desktop-player-identity.compact {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.desktop-player-compact-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
 }
 .desktop-player-name {
   font-size: 18px;
