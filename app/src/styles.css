@@ -357,6 +357,110 @@
   border-radius: 4px;
 }
 
+/* ---------- Home page (desktop) ---------- */
+
+.home-desktop {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.home-hero {
+  position: relative;
+  flex: 1;
+  padding: 40px 56px 0;
+  display: flex;
+  flex-direction: column;
+  background-image: var(--stadium-bg);
+  background-size: cover;
+  background-position: bottom center;
+  background-repeat: no-repeat;
+}
+
+.home-hero-grid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: start;
+  gap: 40px;
+  max-width: 1180px;
+  width: 100%;
+  margin: 40px auto 0;
+}
+
+.home-hero-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  min-width: 280px;
+}
+.home-hero-right .chip-cta {
+  align-self: stretch;
+  justify-content: center;
+  background: color-mix(in srgb, var(--bg-panel-1) 55%, transparent);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border-color: var(--border-strong);
+}
+.home-hero-right .btn-primary {
+  margin-top: 18px;
+}
+.home-hero-right .difficulty-block {
+  width: 100%;
+}
+.home-hero-right .difficulty-toggle {
+  background: color-mix(in srgb, var(--bg-panel-1) 55%, transparent);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border-color: var(--border-strong);
+}
+.home-hero-right .section-label {
+  text-align: right;
+}
+
+.home-how-panel {
+  position: relative;
+  z-index: 1;
+  margin: 48px auto 0;
+  max-width: 1180px;
+  width: 100%;
+  padding: 28px 40px 20px;
+  border-radius: 20px 20px 0 0;
+  background: color-mix(in srgb, var(--bg-panel-1) 74%, transparent);
+  border: 1px solid var(--border-strong);
+  border-bottom: none;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+.home-how-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  margin-top: 18px;
+}
+.home-how-card {
+  padding: 4px 24px;
+  border-left: 1px solid var(--border);
+}
+.home-how-card:first-child {
+  padding-left: 0;
+  border-left: none;
+}
+.home-how-card .rules-num {
+  margin-bottom: 10px;
+}
+.home-how-card .rules-title {
+  margin-bottom: 4px;
+}
+.home-how-panel .home-footer-row {
+  margin-top: 22px;
+}
+
+.home-desktop > .footer-credit {
+  margin: 20px 0 32px;
+}
+
 /* ---------- Build XI page ---------- */
 
 .buildxi-header {

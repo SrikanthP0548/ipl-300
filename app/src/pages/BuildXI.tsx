@@ -6,9 +6,8 @@ import { RoleBadge } from '../components/RoleBadge';
 import { ScoreReadout } from '../components/ScoreReadout';
 import { KeeperIcon, OverseasIcon } from '../components/PlayerIcons';
 import { isLineupComplete, MAX_OVERSEAS, validSlotsForPlayer } from '../draft';
+import { DESKTOP_BREAKPOINT, useMediaQuery } from '../useMediaQuery';
 import type { Player, TeamSeason } from '../types';
-
-const DESKTOP_BREAKPOINT = '(min-width: 900px)';
 
 /** Style for the OS/WK count chips: teal while within the real-XI limit,
  * red once it's been exceeded (overseas) or is still unmet (keeper). */
@@ -113,24 +112,6 @@ function useTeamSpin(pool: TeamSeason[] | undefined, targetIndex: number | null)
   }, [pool, targetIndex]);
 
   return { spinning, spinTeam: pool && pool.length > 0 ? pool[spinIdx % pool.length] : null };
-}
-
-/** Tracks a media query so the page can switch between the mobile single-column
- * layout and the desktop two-pane layout — these differ structurally (a vertical
- * slot list with a detail overlay vs. horizontal slot chips, a wide player card
- * vs. a stacked one), not just by CSS reflow, so this picks which JSX tree renders. */
-function useMediaQuery(query: string): boolean {
-  const [matches, setMatches] = useState(() => window.matchMedia(query).matches);
-
-  useEffect(() => {
-    const mql = window.matchMedia(query);
-    const onChange = () => setMatches(mql.matches);
-    onChange();
-    mql.addEventListener('change', onChange);
-    return () => mql.removeEventListener('change', onChange);
-  }, [query]);
-
-  return matches;
 }
 
 export function BuildXI() {

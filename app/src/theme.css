@@ -59,6 +59,10 @@
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 14px;
+
+  /* Home page hero background - a floodlit stadium at dusk (dark theme) or
+   * under a clear day sky (light theme, overridden below). */
+  --stadium-bg: url('/stadium-dusk-bg.png');
 }
 
 /* Light theme - values sourced from the design tool's light-mode tokens
@@ -95,6 +99,8 @@
 
   --scoreboard-bg: #ffffff;
   --scoreboard-text: #221c10;
+
+  --stadium-bg: url('/stadium-day-bg.png');
 }
 
 * {
