@@ -223,14 +223,18 @@ export function BuildXI() {
     </>
   );
 
+  const spinAccent = teamColor(spinTeam?.franchise, isLightTheme);
+
   const spinBlock = !complete && spinning && (
-    <div className="spin-block">
-      <div className="spin-label">Finding next team…</div>
-      <div className="spin-team-name">{spinTeam ? `${spinTeam.franchise} · ${spinTeam.season}` : ''}</div>
-      <div className="spin-dots">
-        <span className="spin-dot gold" />
-        <span className="spin-dot teal" />
-        <span className="spin-dot red" />
+    <div className="spin-block" style={{ ['--spin-accent' as string]: spinAccent }}>
+      <div className="spin-glow-ring">
+        <div className="spin-label">Finding next team…</div>
+        <div className="spin-team-name">{spinTeam ? `${spinTeam.franchise} · ${spinTeam.season}` : ''}</div>
+        <div className="spin-dots">
+          <span className="spin-dot" />
+          <span className="spin-dot" />
+          <span className="spin-dot" />
+        </div>
       </div>
     </div>
   );
