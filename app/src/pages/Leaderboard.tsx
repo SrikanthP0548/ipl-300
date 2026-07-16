@@ -37,8 +37,11 @@ export function Leaderboard() {
 
   return (
     <div className="page leaderboard-page">
-      <div className="section-label">Leaderboard</div>
-      <h1 className="wordmark small">
+      <div className="wordmark small">
+        IPL<span className="wordmark-accent">-300</span>
+      </div>
+      <div className="section-label leaderboard-section-label">Leaderboard</div>
+      <h1 className="leaderboard-heading">
         Top <span className="wordmark-accent">Chases</span>
       </h1>
 
