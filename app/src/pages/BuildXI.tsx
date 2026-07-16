@@ -484,30 +484,48 @@ function DesktopPlayerCard({
   const validSlots = validSlotsForPlayer(p, arrangement, { assignedPlayers, isLastTeam });
   const pickable = validSlots.length > 0;
 
+  const rangeLabel = p.minPos === p.maxPos ? String(p.minPos) : `${p.minPos}-${p.maxPos}`;
+  const nameRow = (
+    <div className="player-name-row">
+      <div className="desktop-player-name">{p.name}</div>
+      {p.isKeeper && <KeeperIcon color={accent} />}
+      {p.isOverseas && <OverseasIcon color={accent} />}
+    </div>
+  );
+
   return (
     <div
-      className={`desktop-player-card${expanded ? ' expanded' : ''}${!pickable ? ' disabled' : ''}`}
+      className={`desktop-player-card${expanded ? ' expanded' : ''}${!pickable ? ' disabled' : ''}${!scoresVisible ? ' compact' : ''}`}
       style={{ ['--card-accent' as string]: accent }}
       onClick={() => pickable && onToggle()}
     >
-      <div className="desktop-player-row">
-        <div className="desktop-player-identity">
-          <div className="player-name-row">
-            <div className="desktop-player-name">{p.name}</div>
-            {p.isKeeper && <KeeperIcon color={accent} />}
-            {p.isOverseas && <OverseasIcon color={accent} />}
+      {scoresVisible ? (
+        <div className="desktop-player-row">
+          <div className="desktop-player-identity">
+            {nameRow}
+            <div className="player-meta">
+              <RoleBadge role={p.roleBadge} />
+              <span className="range-label">BEST SLOT {rangeLabel}</span>
+            </div>
           </div>
-          <div className="player-meta">
+          <div className="desktop-player-stats">
+            <ScoreReadout label="Batting" value={p.battingScore} hidden={false} />
+            <ScoreReadout label="Finishing" value={p.finishingScore} hidden={false} />
+            <ScoreReadout label="Bowling" value={p.bowlingScore} hidden={false} />
+          </div>
+        </div>
+      ) : (
+        // Scores hidden: a compact single-row layout - no stat boxes at all
+        // (not just dimmed placeholders), matching the design's scoresHidden
+        // state so the desktop list reads faster with the numbers off.
+        <div className="desktop-player-row compact">
+          <div className="desktop-player-identity compact">{nameRow}</div>
+          <div className="desktop-player-compact-right">
             <RoleBadge role={p.roleBadge} />
-            <span className="range-label">BEST SLOT {p.minPos === p.maxPos ? p.minPos : `${p.minPos}-${p.maxPos}`}</span>
+            <span className="range-label">SLOT {rangeLabel}</span>
           </div>
         </div>
-        <div className="desktop-player-stats">
-          <ScoreReadout label="Batting" value={p.battingScore} hidden={!scoresVisible} />
-          <ScoreReadout label="Finishing" value={p.finishingScore} hidden={!scoresVisible} />
-          <ScoreReadout label="Bowling" value={p.bowlingScore} hidden={!scoresVisible} />
-        </div>
-      </div>
+      )}
       {expanded && pickable && (
         <div className="position-picker">
           <div className="position-picker-label">Choose a position</div>
