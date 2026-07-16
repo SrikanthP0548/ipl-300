@@ -475,6 +475,21 @@
   text-align: center;
   min-height: 260px;
 }
+.spin-glow-ring {
+  padding: 32px 28px;
+  border-radius: 20px;
+  border: 2px solid var(--spin-accent, var(--gold));
+  background: color-mix(in srgb, var(--spin-accent, var(--gold)) 8%, transparent);
+  box-shadow:
+    0 0 16px color-mix(in srgb, var(--spin-accent, var(--gold)) 70%, transparent),
+    0 0 40px color-mix(in srgb, var(--spin-accent, var(--gold)) 45%, transparent),
+    inset 0 0 24px color-mix(in srgb, var(--spin-accent, var(--gold)) 20%, transparent);
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    background 0.18s ease;
+  animation: neonPulse 1.4s ease-in-out infinite;
+}
 .spin-label {
   font-family: var(--font-display);
   font-size: 12px;
@@ -488,32 +503,32 @@
   font-family: var(--font-display);
   font-size: 28px;
   font-weight: 800;
-  color: var(--gold);
+  color: var(--spin-accent, var(--gold));
   letter-spacing: -0.5px;
   margin-top: 14px;
-  text-shadow: 0 0 22px rgba(242, 180, 65, 0.55);
+  text-shadow: 0 0 22px color-mix(in srgb, var(--spin-accent, var(--gold)) 55%, transparent);
+  transition: color 0.18s ease, text-shadow 0.18s ease;
   animation: reelFlicker 0.12s ease-in-out infinite;
 }
 .spin-dots {
   display: flex;
   gap: 8px;
   margin-top: 22px;
+  justify-content: center;
 }
 .spin-dot {
   width: 10px;
   height: 10px;
   border-radius: 50%;
+  background: var(--spin-accent, var(--gold));
+  box-shadow: 0 0 8px var(--spin-accent, var(--gold));
+  transition: background 0.18s ease, box-shadow 0.18s ease;
   animation: reelPulse 0.9s ease-in-out infinite;
 }
-.spin-dot.gold {
-  background: var(--gold);
-}
-.spin-dot.teal {
-  background: var(--teal);
+.spin-dot:nth-child(2) {
   animation-delay: 0.2s;
 }
-.spin-dot.red {
-  background: var(--red);
+.spin-dot:nth-child(3) {
   animation-delay: 0.4s;
 }
 

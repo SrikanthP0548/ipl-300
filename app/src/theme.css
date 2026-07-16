@@ -285,6 +285,16 @@ a {
   }
 }
 
+@keyframes neonPulse {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.25);
+  }
+}
+
 @keyframes confettiFall {
   0% {
     transform: translateY(-30px) rotate(0deg);
