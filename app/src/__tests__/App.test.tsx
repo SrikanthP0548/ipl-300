@@ -48,6 +48,34 @@ describe('App', () => {
     expect(await screen.findAllByText('•••', {}, { timeout: 3500 })).toHaveLength(2);
   }, 6000);
 
+  it('only allows one manual skip for the whole draft', async () => {
+    fetchMock.mockResolvedValueOnce(
+      Response.json(
+        squadsResponse({
+          pool: [
+            teamSeason({ id: 'team-a', franchise: 'Team A', season: 2011 }),
+            teamSeason({ id: 'team-b', franchise: 'Team B', season: 2012 }),
+            teamSeason({ id: 'team-c', franchise: 'Team C', season: 2013 }),
+          ],
+        }),
+      ),
+    );
+    const user = userEvent.setup();
+
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: /build your xi/i }));
+
+    const skipButton = await screen.findByRole('button', { name: /skip team/i }, { timeout: 3500 });
+    await user.click(skipButton);
+
+    const usedButton = await screen.findByRole('button', { name: /skip used/i }, { timeout: 3500 });
+    expect(usedButton).toBeDisabled();
+
+    await user.click(usedButton);
+    // Still on the second team-season - the disabled click was a no-op, not a second skip.
+    expect(screen.getByText(/Team B/)).toBeInTheDocument();
+  }, 8000);
+
   it('lets a player be expanded and placed into a lineup slot', async () => {
     fetchMock.mockResolvedValueOnce(
       Response.json(
