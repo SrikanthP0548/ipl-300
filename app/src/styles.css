@@ -408,15 +408,18 @@
 }
 .home-hero-right .difficulty-block {
   width: 100%;
-}
-.home-hero-right .difficulty-toggle {
+  padding: 12px 16px 14px;
+  border-radius: 12px;
   background: color-mix(in srgb, var(--bg-panel-1) 55%, transparent);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
-  border-color: var(--border-strong);
+  border: 1px solid var(--border-strong);
+}
+.home-hero-right .difficulty-toggle {
+  margin-top: 10px;
 }
 .home-hero-right .section-label {
-  text-align: right;
+  text-align: left;
 }
 
 .home-how-panel {
