@@ -21,6 +21,10 @@ function unresolvedCount(pool: TeamSeason[], resolvedTeamIds: Set<string>): numb
   return pool.filter((t) => !resolvedTeamIds.has(t.id)).length;
 }
 
+/** The draft rules (see Home page copy) allow exactly one manual skip per
+ * session, not one per team-season. */
+const MAX_SKIPS = 1;
+
 interface DraftState {
   pool: TeamSeason[];
   poolIds: string[];
@@ -160,14 +164,13 @@ export function GameProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  // Each team-season may be skipped once (not a draft-wide budget) - the
-  // button just guards against double-firing on the same team, since
-  // findNextTeamIndex never revisits a resolved team in normal flow.
+  // Only one manual skip is allowed for the whole draft session - guard here
+  // is authoritative, not just what the UI disables, so it can't be bypassed.
   const skipCurrentTeam = useCallback(() => {
     setDraft((d) => {
       if (!d) return d;
       const team = d.pool[d.teamPointer];
-      if (!team || d.skippedTeamIds.has(team.id)) return d;
+      if (!team || d.skippedTeamIds.size >= MAX_SKIPS || d.skippedTeamIds.has(team.id)) return d;
       const resolved = new Set(d.resolvedTeamIds);
       resolved.add(team.id);
       const skipped = new Set(d.skippedTeamIds);
@@ -200,7 +203,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   }, [draft]);
 
   const currentTeam = draft && draft.teamPointer < draft.pool.length ? draft.pool[draft.teamPointer] : null;
-  const canSkipCurrentTeam = !!draft && !!currentTeam && !draft.skippedTeamIds.has(currentTeam.id);
+  const canSkipCurrentTeam = !!draft && !!currentTeam && draft.skippedTeamIds.size < MAX_SKIPS;
 
   const allPlayersById = useMemo(() => {
     const map = new Map<string, { player: Player; teamSeasonId: string; teamIndex: number; franchise: string; season: number }>();
