@@ -61,8 +61,10 @@
   --radius-lg: 14px;
 
   /* Home page hero background - a floodlit stadium at dusk (dark theme) or
-   * under a clear day sky (light theme, overridden below). */
+   * under a clear day sky (light theme, overridden below). Separate crops
+   * for the desktop (landscape) and mobile (portrait) hero. */
   --stadium-bg: url('/stadium-dusk-bg.png');
+  --stadium-bg-mobile: url('/stadium-bg-mobile.jpg');
 }
 
 /* Light theme - values sourced from the design tool's light-mode tokens
@@ -101,6 +103,7 @@
   --scoreboard-text: #221c10;
 
   --stadium-bg: url('/stadium-day-bg.png');
+  --stadium-bg-mobile: url('/stadium-bg-mobile-light.jpg');
 }
 
 * {
